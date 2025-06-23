@@ -22,6 +22,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity.PickupPermissi
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.TridentItem;
 import net.minecraft.item.ProjectileItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.consume.UseAction;
@@ -44,9 +45,11 @@ public class DaggerItem extends Item implements ProjectileItem {
 	public static final int MIN_DRAW_DURATION = 10;
 	public static final float ATTACK_DAMAGE = 8.0F;
 	public static final float THROW_SPEED = 2.5F;
+	private final DaggerToolMaterial material;
 
-	public DaggerItem(Item.Settings settings) {
+	public DaggerItem(Item.Settings settings, DaggerToolMaterial material) {
 		super(settings);
+		this.material = material;
 	}
 
 	public static AttributeModifiersComponent createAttributeModifiers() {
@@ -55,7 +58,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 			.add(EntityAttributes.ATTACK_SPEED, new EntityAttributeModifier(BASE_ATTACK_SPEED_MODIFIER_ID, -2.9000000953674316, Operation.ADD_VALUE), AttributeModifierSlot.MAINHAND)
 			.build();
 	}
-
+	// This method creates a ToolComponent for the dagger, specifying no tool types, a mining speed of 1.0F, and a mining level of 2.
 	public static ToolComponent createToolComponent() {
 		return new ToolComponent(List.of(), 1.0F, 2);
 	}
@@ -90,7 +93,8 @@ public class DaggerItem extends Item implements ProjectileItem {
 						ServerWorld serverWorld = (ServerWorld)world;
 						stack.damage(1, playerEntity);
 						if (f == 0.0F) {
-							DaggerEntity daggerEntity = (DaggerEntity)ProjectileEntity.spawnWithVelocity(DaggerEntity::new, serverWorld, stack.copy(), playerEntity, 0.0F, 2.5F, 1.0F);
+							DaggerEntity daggerEntity = (DaggerEntity)(DaggerEntity.spawnWithVelocity(DaggerEntity::new, serverWorld, stack.copy(), playerEntity, 0.0F, 2.5F, 1.0F));
+                            System.out.println("DaggerItem onStoppedUsing daggerEntity: " + daggerEntity.getItemStack());
 							if (playerEntity.isCreative()) {
 								daggerEntity.pickupType = PickupPermission.CREATIVE_ONLY;
 							} else {
