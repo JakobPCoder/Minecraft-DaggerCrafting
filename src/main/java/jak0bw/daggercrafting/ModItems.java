@@ -42,13 +42,13 @@ public class ModItems {
     // Diamond Arrow item
     public static final Item IRON_DAGGER = registerItem(
         "iron_dagger",
-        settings -> new DaggerItem(settings),
+        settings -> new DaggerItem(settings, DaggerToolMaterial.IRON),
         new Item.Settings()
     );
 
     public static final Item DIAMOND_DAGGER = registerItem(
         "diamond_dagger",
-        settings -> new DaggerItem(settings),
+        settings -> new DaggerItem(settings, DaggerToolMaterial.DIAMOND),
         new Item.Settings()
     );
 

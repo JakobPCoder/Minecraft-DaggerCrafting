@@ -13,13 +13,18 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.SpectralArrowItem;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
@@ -27,31 +32,70 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import jak0bw.daggercrafting.DaggerCrafting;
 import jak0bw.daggercrafting.ModEntities;
 import jak0bw.daggercrafting.ModItems;
 
 public class DaggerEntity extends PersistentProjectileEntity implements FlyingItemEntity{
-	private static final TrackedData<Byte> LOYALTY;
-	private static final TrackedData<Boolean> ENCHANTED;
+
+    private static final TrackedData<Byte> LOYALTY;
+    private static final TrackedData<Boolean> ENCHANTED;
+    public String itemId;
+    public float seconds;
+	/**
+	 * Damping factor for dagger motion.
+	 */
 	private static final float field_55019 = 0.99F;
+
+	/**
+	 * Whether the dagger has dealt damage.
+	 */
 	private boolean dealtDamage;
+
+	/**
+	 * Timer for dagger returning.
+	 */
 	public int returnTimer;
 
-	public DaggerEntity(EntityType<? extends DaggerEntity> entityType, World world) {
+	public DaggerEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
 		super(entityType, world);
+        System.out.println("DaggerEntity Constructor 1");
+        System.out.println("DaggerEntity Constructor 1 entityType: " + entityType);
 	}
 
 	public DaggerEntity(World world, LivingEntity owner, ItemStack stack) {
-		super(ModEntities.DAGGER, owner, world, stack, stack);
+        super((EntityType<? extends PersistentProjectileEntity>)Registries.ENTITY_TYPE.get(Identifier.of(DaggerCrafting.MOD_ID, Registries.ITEM.getId(stack.getItem()).getPath())), owner, world, stack, (ItemStack)null);
+        System.out.println("DaggerEntity Constructor 2 stack: " + stack);
 		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
 		this.dataTracker.set(ENCHANTED, stack.hasGlint());
+        System.out.println("DaggerEntity Constructor 2");
 	}
 
 	public DaggerEntity(World world, double x, double y, double z, ItemStack stack) {
-		super(ModEntities.DAGGER, x, y, z, world, stack, stack);
+		super(ModEntities.DIAMOND_DAGGER, x, y, z, world, stack, (ItemStack)null);
+        System.out.println("DaggerEntity Constructor 3 stack: " + stack);
 		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
 		this.dataTracker.set(ENCHANTED, stack.hasGlint());
+        System.out.println("DaggerEntity Constructor 3");
 	}
+
+
+	public DaggerEntity(World world, LivingEntity owner, ItemStack stack, EntityType<? extends DaggerEntity> daggerType) {
+		super(daggerType, owner, world, stack, (ItemStack)null);
+        System.out.println("DaggerEntity Constructor 4 stack: " + stack);
+		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
+		this.dataTracker.set(ENCHANTED, stack.hasGlint());
+        System.out.println("DaggerEntity Constructor 4");
+	}
+
+	public DaggerEntity(World world, double x, double y, double z, ItemStack stack, EntityType<? extends DaggerEntity> daggerType) {
+		super(daggerType, x, y, z, world, stack, (ItemStack)null);
+        System.out.println("DaggerEntity Constructor 5 stack: " + stack);
+		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
+		this.dataTracker.set(ENCHANTED, stack.hasGlint());
+        System.out.println("DaggerEntity Constructor 5");
+	}
+
 
     @Override
     public ItemStack getStack() {
@@ -64,6 +108,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		builder.add(ENCHANTED, false);
 	}
 
+        
 	public void tick() {
 		if (this.inGroundTime > 4) {
 			this.dealtDamage = true;
@@ -74,6 +119,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		if (i > 0 && (this.dealtDamage || this.isNoClip()) && entity != null) {
 			if (!this.isOwnerAlive()) {
 				World var4 = this.getWorld();
+                
 				if (var4 instanceof ServerWorld) {
 					ServerWorld serverWorld = (ServerWorld) var4;
 					if (this.pickupType == PickupPermission.ALLOWED) {
@@ -110,6 +156,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
             if (velocity.lengthSquared() > 0.0001) {
                 this.setYaw((float)Math.toDegrees(MathHelper.atan2(velocity.x, velocity.z)));
                 this.setPitch((float)Math.toDegrees(MathHelper.atan2(velocity.y, velocity.horizontalLength())));
+                this.seconds = (float)this.age / 20.0f;
             }
         }
 	}
@@ -193,8 +240,19 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 				|| this.isNoClip() && this.isOwner(player) && player.getInventory().insertStack(this.asItemStack());
 	}
 
+	@Override
 	protected ItemStack getDefaultItemStack() {
-		return new ItemStack(ModItems.DIAMOND_DAGGER);
+		String itemPath = Registries.ENTITY_TYPE.getId(this.getType()).getPath();
+		Identifier itemId = Identifier.of(DaggerCrafting.MOD_ID, itemPath);
+		Item item = Registries.ITEM.get(itemId);
+		if (item != null && item != Items.AIR) {
+            System.out.println("DaggerEntity getDefaultItemStack item SUCCESS");
+			return new ItemStack(item);
+
+		} else {
+            System.out.println("DaggerEntity getDefaultItemStack item FAIL");
+			return new ItemStack(Registries.ITEM.get(Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")));
+		}
 	}
 
 	protected SoundEvent getHitSound() {

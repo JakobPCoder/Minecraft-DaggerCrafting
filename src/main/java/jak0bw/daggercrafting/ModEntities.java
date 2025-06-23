@@ -1,6 +1,7 @@
 package jak0bw.daggercrafting;
 
 import jak0bw.daggercrafting.entity.DaggerEntity;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -17,16 +18,26 @@ public class ModEntities {
     /**
      * Wood Arrow Entity Type - extends ArrowEntity with increased damage
      */
-    public static final EntityType<DaggerEntity> DAGGER = Registry.register(
+    public static final EntityType<DaggerEntity> IRON_DAGGER = Registry.register(
         Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "dagger"),
+        Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger"),
         EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
             .dimensions(0.5f, 0.5f)
             .maxTrackingRange(4)
             .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "dagger")))
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger")))
     );
 
+    
+    public static final EntityType<DaggerEntity> DIAMOND_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")))
+    );
 
     /**
      * Registers all mod entities.

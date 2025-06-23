@@ -25,6 +25,20 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
         super(context);
         this.itemModelManager = context.getItemModelManager();
     }
+
+    
+    private float getSpinningOffset(float seconds) {
+        // based on secconds we want to return a value between 0 and 360
+        // for now we want try as spinning animation where we get
+        // one static var that tells how many secconds one rotation takes and the rest is mapped automaticaly
+        {
+            final float seccons_per_rotation = 0.5f;
+            float rotationOffset = (seconds * 360.0f) / seccons_per_rotation;
+            return rotationOffset;
+        }
+    }
+
+
     @Override
     public void render(FlyingItemEntityRenderState flyingItemEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
@@ -39,7 +53,7 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
             matrixStack.multiply(quaternion);
 
             org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
-                (float)Math.toRadians(135),
+                (float)Math.toRadians(135) + getSpinningOffset(daggerState.seconds),
                 (float)Math.toRadians(90),
                 0.0f
             );
@@ -62,16 +76,16 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
         DaggerEntityRenderState daggerEntityRenderState = (DaggerEntityRenderState) flyingItemEntityRenderState;
         daggerEntityRenderState.yaw = entity.getYaw();
         daggerEntityRenderState.pitch = entity.getPitch();
+        daggerEntityRenderState.seconds = entity.seconds;
 
-    
-        ItemStack stack = entity.getStack();
+        ItemStack stack = entity.getItemStack();
 
         if (stack == null || stack.isEmpty()) 
             throw new IllegalStateException("DaggerEntityRenderer: Stack is null or empty");
-    
+      
         this.itemModelManager.updateForNonLivingEntity(
             flyingItemEntityRenderState.itemRenderState, 
-            stack, // Using the null-safe stack
+            stack, 
             ModelTransformationMode.GROUND,
             entity
         );
