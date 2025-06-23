@@ -40,6 +40,24 @@ public class ModItems {
     }
 
     // Diamond Arrow item
+    public static final Item WOODEN_DAGGER = registerItem(
+        "wooden_dagger",
+        settings -> new DaggerItem(settings, DaggerToolMaterial.WOOD),
+        new Item.Settings()
+    );
+
+    public static final Item STONE_DAGGER = registerItem(
+        "stone_dagger",
+        settings -> new DaggerItem(settings, DaggerToolMaterial.STONE),
+        new Item.Settings()
+    );
+
+    public static final Item GOLDEN_DAGGER = registerItem(
+        "golden_dagger",
+        settings -> new DaggerItem(settings, DaggerToolMaterial.GOLD),
+        new Item.Settings()
+    );
+
     public static final Item IRON_DAGGER = registerItem(
         "iron_dagger",
         settings -> new DaggerItem(settings, DaggerToolMaterial.IRON),
@@ -52,9 +70,11 @@ public class ModItems {
         new Item.Settings()
     );
 
-
     private static void registerCombatTabItems() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
+            entries.add(WOODEN_DAGGER);
+            entries.add(STONE_DAGGER);
+            entries.add(GOLDEN_DAGGER);
             entries.add(IRON_DAGGER);
             entries.add(DIAMOND_DAGGER);
 
