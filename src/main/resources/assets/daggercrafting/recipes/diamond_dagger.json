@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " d ",
+    " s ",
+    " s "
+  ],
+  "key": {
+    "d": { "item": "minecraft:diamond" },
+    "s": { "item": "minecraft:stick" }
+  },
+  "result": {
+    "id": "daggercrafting:diamond_dagger"
+  }
+}

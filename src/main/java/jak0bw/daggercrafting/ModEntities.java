@@ -18,27 +18,6 @@ public class ModEntities {
     /**
      * Wood Arrow Entity Type - extends ArrowEntity with increased damage
      */
-    public static final EntityType<DaggerEntity> IRON_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger")))
-    );
-
-    
-    public static final EntityType<DaggerEntity> DIAMOND_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")))
-    );
-
     public static final EntityType<DaggerEntity> WOODEN_DAGGER = Registry.register(
         Registries.ENTITY_TYPE,
         Identifier.of(DaggerCrafting.MOD_ID, "wooden_dagger"),
@@ -67,6 +46,26 @@ public class ModEntities {
             .maxTrackingRange(4)
             .trackingTickInterval(20)
             .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "golden_dagger")))
+    );
+
+    public static final EntityType<DaggerEntity> IRON_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger")))
+    );
+
+    public static final EntityType<DaggerEntity> DIAMOND_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")))
     );
 
     /**

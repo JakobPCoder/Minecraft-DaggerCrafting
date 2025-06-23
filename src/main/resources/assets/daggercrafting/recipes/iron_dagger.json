@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " i ",
+    " s ",
+    " s "
+  ],
+  "key": {
+    "i": { "item": "minecraft:iron_ingot" },
+    "s": { "item": "minecraft:stick" }
+  },
+  "result": {
+    "id": "daggercrafting:iron_dagger"
+  }
+}
