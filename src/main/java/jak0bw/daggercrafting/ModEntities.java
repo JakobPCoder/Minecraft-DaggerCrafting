@@ -39,6 +39,36 @@ public class ModEntities {
             .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")))
     );
 
+    public static final EntityType<DaggerEntity> WOODEN_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "wooden_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "wooden_dagger")))
+    );
+
+    public static final EntityType<DaggerEntity> STONE_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "stone_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "stone_dagger")))
+    );
+
+    public static final EntityType<DaggerEntity> GOLDEN_DAGGER = Registry.register(
+        Registries.ENTITY_TYPE,
+        Identifier.of(DaggerCrafting.MOD_ID, "golden_dagger"),
+        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
+            .dimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "golden_dagger")))
+    );
+
     /**
      * Registers all mod entities.
      * Should be called during mod initialization.
