@@ -1,15 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " i ",
-    " s ",
-    " s "
+    " I ",
+    " S ",
+    " S "
   ],
   "key": {
-    "i": { "item": "minecraft:iron_ingot" },
-    "s": { "item": "minecraft:stick" }
+    "I": "minecraft:iron_ingot",
+    "S": "minecraft:stick"
   },
   "result": {
-    "id": "daggercrafting:iron_dagger"
+    "id": "daggercrafting:iron_dagger",
+    "count": 1
   }
 }

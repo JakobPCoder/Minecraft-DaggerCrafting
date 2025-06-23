@@ -1,15 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " g ",
-    " s ",
-    " s "
+    " G ",
+    " S ",
+    " S "
   ],
   "key": {
-    "g": { "item": "minecraft:gold_ingot" },
-    "s": { "item": "minecraft:stick" }
+    "G": "minecraft:gold_ingot",
+    "S": "minecraft:stick"
   },
   "result": {
-    "id": "daggercrafting:golden_dagger"
+    "id": "daggercrafting:golden_dagger",
+    "count": 1
   }
 }

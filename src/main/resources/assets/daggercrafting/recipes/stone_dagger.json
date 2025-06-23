@@ -1,15 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " c ",
-    " s ",
-    " s "
+    " C ",
+    " S ",
+    " S "
   ],
   "key": {
-    "c": { "item": "minecraft:cobblestone" },
-    "s": { "item": "minecraft:stick" }
+    "C": "minecraft:cobblestone",
+    "S": "minecraft:stick"
   },
   "result": {
-    "id": "daggercrafting:stone_dagger"
+    "id": "daggercrafting:stone_dagger",
+    "count": 1
   }
 }
