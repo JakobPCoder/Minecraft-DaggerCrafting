@@ -14,6 +14,9 @@ public class DaggerCraftingClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         LOGGER.info("DaggerCrafting client initialized");
+        EntityRendererRegistry.register(ModEntities.WOODEN_DAGGER, DaggerEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.STONE_DAGGER, DaggerEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.GOLDEN_DAGGER, DaggerEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.IRON_DAGGER, DaggerEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.DIAMOND_DAGGER, DaggerEntityRenderer::new);
     }
