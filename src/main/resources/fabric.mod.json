@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "daggercrafting",
+	"version": "${version}",
+	"name": "DaggerCrafting",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Jak0bW"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/members/jak0bw/projects",
+		"sources": "https://github.com/Jak0bW/DaggerCrafting"
+	},
+	"license": "CC BY-NC 4.0",
+	"icon": "assets/daggercrafting/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"jak0bw.daggercrafting.DaggerCrafting"
+		],
+		"fabric-datagen": [
+			"jak0bw.daggercrafting.DaggerCraftingDataGenerator"
+		],
+		"client": [
+			"jak0bw.daggercrafting.DaggerCraftingClient"
+		]
+	},
+	
+	"mixins": [
+		"daggercrafting.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

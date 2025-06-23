@@ -1,0 +1,53 @@
+---
+description: when adding items or editing them, always load this.
+globs: 
+alwaysApply: false
+---
+# Quick Guide: Adding a New Custom Arrow Type
+
+To add a new arrow (e.g., "Copper Arrow"), follow these steps:
+
+---
+
+## 1. Java Code
+- **Register Items:**
+  - Edit `src/main/java/jak0bw/arrowcrafting/ModItems.java`
+    - Add new `CustomArrowHeadItem` and `CustomArrowItem` (with damage multiplier).
+    - Add to creative tabs in `registerModItems()`.
+- *(Optional)* For unique logic, subclass `CustomArrowEntity` or `CustomArrowItem` and register in `ModEntities.java`.
+
+## 2. Resources & Data
+- **Language:**
+  - Edit `src/main/resources/assets/arrowcrafting/lang/en_us.json`
+    - Add display names for arrow and arrow head.
+- **Items:**
+  - This is the main Item definition.
+  - Add `your_arrow.json` and `your_arrow_head.json` to `items/`.
+- **Models:**
+  - Add `your_arrow.json` and `your_arrow_head.json` to `models/item/`.
+- **Recipes:**
+  - Add `your_arrow.json` and `your_arrow_head.json` to `data/arrowcrafting/recipe/`.
+- **Tags:**
+  - Edit `data/minecraft/tags/item/arrows.json` to include your new arrow.
+- **Textures:**
+- The user needs to add `your_arrow.png` and `your_arrow_head.png` to `textures/item/`.
+
+---
+
+## Example File Names (replace 'your' with your material):
+- `your_arrow.json`, `your_arrow_head.json` (in models/item/, items/, recipe/)
+- `your_arrow.png`, `your_arrow_head.png` (in textures/item/)
+
+---
+
+**Keep all occurences of custom arrows ordered by their damage multiplier / tier**
+This means starting with wood, ending with diamond or whatever, look at the readme for the exact damage values.
+This applies to all things like code, json files, lists etc.
+
+**Summary:**
+1. Register new items in Java.
+2. Add/modify JSONs for items, models, recipes, tags, and language.
+3. Add textures.
+
+
+That's it! Follow the patterns of existing arrows for file content and structure.
