@@ -26,18 +26,18 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
         this.itemModelManager = context.getItemModelManager();
     }
 
-    
-    private float getSpinningOffset(float seconds) {
-        // based on secconds we want to return a value between 0 and 360
-        // for now we want try as spinning animation where we get
-        // one static var that tells how many secconds one rotation takes and the rest is mapped automaticaly
-        {
-            final float seccons_per_rotation = 0.5f;
-            float rotationOffset = (seconds * 360.0f) / seccons_per_rotation;
-            return rotationOffset;
-        }
+    /**
+     * Animates from startAngle to endAngle over duration seconds using ease-in/ease-out.
+     * After duration, stays at endAngle.
+     */
+    private float getAnimatedAngle(float seconds, float startAngle, float endAngle, float duration) {
+        if (seconds <= 0) return startAngle;
+        if (seconds >= duration) return endAngle;
+        float t = seconds / duration;
+        // Quadratic ease-out
+        float easeOutT = 1f - (1f - t) * (1f - t);
+        return startAngle + (endAngle - startAngle) * easeOutT;
     }
-
 
     @Override
     public void render(FlyingItemEntityRenderState flyingItemEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
@@ -52,8 +52,9 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
             );
             matrixStack.multiply(quaternion);
 
+            // Example: animate from 135deg to 405deg (135+270) over 1.5 seconds
             org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
-                (float)Math.toRadians(135) + getSpinningOffset(daggerState.seconds),
+                (float)Math.toRadians(this.getAnimatedAngle(daggerState.seconds,70, 135, 0.3f)),
                 (float)Math.toRadians(90),
                 0.0f
             );

@@ -1,6 +1,6 @@
 {
     "parent": "daggercrafting:item/dagger",
     "textures": {
-        "layer0": "minecraft:item/wooden_sword"
+        "layer0": "daggercrafting:item/wooden_dagger"
     }
 }

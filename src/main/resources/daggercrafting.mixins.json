@@ -3,7 +3,7 @@
 	"package": "jak0bw.daggercrafting.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"EnchantmentMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

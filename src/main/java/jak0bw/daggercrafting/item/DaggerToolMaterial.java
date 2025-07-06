@@ -82,58 +82,58 @@ public class DaggerToolMaterial {
 
     
     public static final DaggerToolMaterial WOOD = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
-        59,   // 80% of wood sword durability (59)
+        BlockTags.INCORRECT_FOR_WOODEN_TOOL,
+        30,  
         2.0F, // Wood mining speed
-        0.0F, // Wood sword damage (matches vanilla)
-        15,   // Wood enchantability  
+        1.0F, // Wood sword damage (matches vanilla)
+        15,   
         ItemTags.REPAIRS_WOODEN_DAGGER,
-        4.0F, // Ranged damage
-        1.0F  // Ranged velocity
-    );
-
-    public static final DaggerToolMaterial STONE = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
-        131,   // 80% of stone sword durability (131)
-        2.0F, // Stone mining speed
-        0.0F, // Stone sword damage (matches vanilla)
-        15,   // Stone enchantability  
-        ItemTags.REPAIRS_STONE_DAGGER,
-        4.0F, // Ranged damage
-        1.0F  // Ranged velocity
+        3.0F, // Ranged damage
+        1.4F  // Ranged velocity
     );
 
     public static final DaggerToolMaterial GOLD = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_STONE_TOOL,
-        32,   // 80% of gold sword durability (32)
-        2.0F, // Gold mining speed
-        0.0F, // Gold sword damage (matches vanilla)
-        15,   // Gold enchantability  
+        20,  
+        2.0F, //
+        1.0F, // 
+        25,  // Copper will be 20
         ItemTags.REPAIRS_GOLDEN_DAGGER,
-        4.0F, // Ranged damage
-        1.0F  // Ranged velocity
+        3.0F, // Ranged damage
+        1.6F  // Ranged velocity
+    );
+
+    public static final DaggerToolMaterial STONE = new DaggerToolMaterial(
+        BlockTags.INCORRECT_FOR_STONE_TOOL,
+        50,  
+        2.0F, 
+        2.0F, 
+        12,    
+        ItemTags.REPAIRS_STONE_DAGGER,
+        5.0F, // Ranged damage
+        1.6F  // Ranged velocity
     );
 
     public static final DaggerToolMaterial IRON = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_STONE_TOOL,
-        131,   // 80% of wood sword durability (59)
-        2.0F, // Wood mining speed
-        0.0F, // Wood sword damage (matches vanilla)
-        15,   // Wood enchantability  
+        100,   
+        2.0F, // 
+        3.0F, // 
+        11,     // steel will also be 11
         ItemTags.REPAIRS_IRON_DAGGER,
-        4.0F, // Ranged damage
-        1.0F  // Ranged velocity
+        7.0F, // Ranged damage
+        1.8F // Ranged velocity
     );
 
     public static final DaggerToolMaterial DIAMOND = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_STONE_TOOL,
-        47,   // 80% of wood sword durability (59)
-        2.0F, // Wood mining speed
-        0.0F, // Wood sword damage (matches vanilla)
-        15,   // Wood enchantability  
+        250,   
+        2.0F, // 
+        4.0F, // 
+        10,   
         ItemTags.REPAIRS_DIAMOND_DAGGER,
-        4.0F, // Ranged damage
-        1.0F  // Ranged velocity
+        8.0F, // Ranged damage
+        2.0F  // Ranged velocity
     );
 
 }

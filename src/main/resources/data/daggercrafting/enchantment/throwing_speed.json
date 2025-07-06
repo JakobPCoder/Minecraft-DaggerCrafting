@@ -1,0 +1,20 @@
+{
+  "description": {
+    "translate": "enchantment.daggercrafting.throwing_speed"
+  },
+  "supported_items": "#daggercrafting:daggers",
+  "primary_items": "#daggercrafting:daggers",
+  "weight": 6,
+  "max_level": 3,
+  "min_cost": {
+    "base": 3,
+    "per_level_above_first": 5
+  },
+  "max_cost": {
+    "base": 10,
+    "per_level_above_first": 10
+  },
+  "anvil_cost": 1,
+  "slots": ["mainhand"],
+  "effects": {}
+} 
