@@ -25,6 +25,8 @@ public class ModItems {
 
     /**
      * Registers an item with optional mod dependencies and creative tab groups.
+     * Delays the registration of the item until the mod is fully initialized,
+     * by adding it to a list of actions to be performed at mod item registration.
      *
      * @param name The name of the item to register.
      * @param factory A function that creates the item from the given Item.Settings.
@@ -60,16 +62,16 @@ public class ModItems {
         List.of(ItemGroups.COMBAT)
     );
 
-    public static final Item GOLDEN_DAGGER = registerItem(
-        "golden_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.GOLD),
+    public static final Item IRON_DAGGER = registerItem(
+        "iron_dagger",
+        settings -> new DaggerItem(settings, DaggerToolMaterial.IRON),
         new Item.Settings(),
         List.of(ItemGroups.COMBAT)
     );
 
-    public static final Item IRON_DAGGER = registerItem(
-        "iron_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.IRON),
+    public static final Item GOLDEN_DAGGER = registerItem(
+        "golden_dagger",
+        settings -> new DaggerItem(settings, DaggerToolMaterial.GOLD),
         new Item.Settings(),
         List.of(ItemGroups.COMBAT)
     );

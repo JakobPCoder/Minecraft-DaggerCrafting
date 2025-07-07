@@ -59,7 +59,7 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 
 public class DaggerItem extends Item implements ProjectileItem {
 	public static final int MIN_DRAW_DURATION = 10;
-	private static final float ATTACK_SPEED = -1.5F;
+	private static final float ATTACK_SPEED = -2.0F;
 
 	private final DaggerToolMaterial material;
 
@@ -209,21 +209,10 @@ public class DaggerItem extends Item implements ProjectileItem {
 			
 			// If the dagger was held for less than 10 ticks, it's considered an accidental click
 			// or an insufficient charge. In this case, the throwing action is cancelled.
-			if (chargeTime < 10) {
+			if (chargeTime < 5) {
 				return false; // Not charged enough, prevent throw or Riptide.
 			} else {
-				// Determine the level of the Riptide-like enchantment on the dagger.
-				// If Riptide is present and conditions are met, the player will be launched, not the dagger.
-				float riptideLevel = EnchantmentHelper.getTridentSpinAttackStrength(stack, playerEntity);
-				
-				// Riptide enchantment only functions when the player is in water or rain.
-				// If Riptide is present but the player is not in the correct environment, the action fails.
-				if (riptideLevel > 0.0F && !playerEntity.isTouchingWaterOrRain()) {
-					return false; // Riptide not usable in current environment.
-				} 
-				// If the dagger has only 1 durability left, attempting to use it for throwing/riptide
-				// would cause it to break. This check prevents it from breaking on the last use.
-				else if (stack.willBreakNextUse()) {
+				if (stack.willBreakNextUse()) {
 					return false; // Prevent breaking on use; preserve the broken dagger.
 				} else {
 					// Retrieve the specific sound event to play when the dagger is used. This can be
@@ -241,13 +230,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 						// Daggers lose durability when thrown or used with Riptide, similar to tridents.
 						stack.damage(1, playerEntity);
 						
-						// Create a new DaggerEntity (the flying projectile) and initialize its properties:
-						// - `DaggerEntity::new`: Constructor reference for the entity.
-						// - `serverWorld`: The world to spawn the entity in. 
-						// - `stack`: The dagger ItemStack itself (its NBT data is copied to the entity).
-						// - `playerEntity`: The player who threw it (used for origin and velocity calculation).
-						// - `0.0F, this.material.getRangedVelocity(), 0.0F`: These parameters determine the initial
-						//   pitch, velocity, and inaccuracy. The velocity is derived from the dagger's material.
 						float speed = this.material.getRangedVelocity();
 
 						// Get the level of the throwing speed enchantment
@@ -267,14 +249,17 @@ public class DaggerItem extends Item implements ProjectileItem {
 							// No cap - let the synchronization system handle any speed dynamically
 						}
 
-						playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() + 0.2, playerEntity.getZ());
-						playerEntity.setPitch(playerEntity.getPitch() + 3);
+
+						float heightOffset = 0.2f;
+						float pitchOffset = 3.0f / speed;
+						// playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() + heightOffset, playerEntity.getZ());
+						// playerEntity.setPitch(playerEntity.getPitch() - pitchOffset);
 
 						DaggerEntity daggerEntity = (DaggerEntity)(DaggerEntity.spawnWithVelocity(DaggerEntity::new, serverWorld, stack, playerEntity, 0.0F, speed, 0.0F));
 						System.out.println("DaggerItem onStoppedUsing daggerEntity: " + daggerEntity.getItemStack()); // Debug print for the thrown dagger
 
-						playerEntity.setPitch(playerEntity.getPitch() - 3);
-						playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() - 0.2, playerEntity.getZ());
+						// playerEntity.setPitch(playerEntity.getPitch() + pitchOffset);
+						// playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() - heightOffset, playerEntity.getZ());
 
 						// If the player is in creative mode, the dagger is not removed from their inventory,
 						// and the thrown entity can only be picked up by creative players.

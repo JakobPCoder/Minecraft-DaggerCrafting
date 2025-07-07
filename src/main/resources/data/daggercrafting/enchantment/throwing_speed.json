@@ -4,17 +4,27 @@
   },
   "supported_items": "#daggercrafting:daggers",
   "primary_items": "#daggercrafting:daggers",
-  "weight": 6,
+  "weight": 5,
   "max_level": 3,
+  "treasure": false,
   "min_cost": {
-    "base": 3,
+    "base": 2,
     "per_level_above_first": 5
   },
   "max_cost": {
-    "base": 10,
-    "per_level_above_first": 10
+    "base": 5,
+    "per_level_above_first": 15
   },
-  "anvil_cost": 1,
-  "slots": ["mainhand"],
-  "effects": {}
+  "anvil_cost": 2,
+  "slots": ["hand"],
+  "effects": {
+    "minecraft:projectile_spawned": [
+      {
+        "effect": {
+          "type": "minecraft:all_of",
+          "effects": []
+        }
+      }
+    ]
+  }
 } 

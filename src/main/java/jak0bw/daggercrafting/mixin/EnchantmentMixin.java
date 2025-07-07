@@ -38,7 +38,7 @@ public class EnchantmentMixin {
             (Enchantment)(Object)this,
             stack,
             cir,
-            new String[]{"loyalty", "unbreaking", "sharpness", "smite", "bane_of_arthropods", "mending", "flame", "fire_aspect", "throwing_speed"},
+            new String[]{"flame", "fire aspect", "throwing speed", "loyalty", "unbreaking", "sharpness", "smite", "bane of arthropods", "mending"},
             "anvil"
         );
     }
@@ -49,7 +49,7 @@ public class EnchantmentMixin {
             (Enchantment)(Object)this,
             stack,
             cir,
-            new String[]{"loyalty", "unbreaking", "sharpness", "smite", "bane_of_arthropods", "flame", "fire_aspect", "throwing_speed"},
+            new String[]{"flame", "fire aspect", "throwing speed", "loyalty", "unbreaking", "sharpness", "smite", "bane of arthropods"},
             "enchanting_table"
         );
     }

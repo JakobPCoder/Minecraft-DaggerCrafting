@@ -79,29 +79,19 @@ public class DaggerToolMaterial {
         return this.rangedVelocity;
     }
 
-
+    // meele attack damage is + 1
     
     public static final DaggerToolMaterial WOOD = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_WOODEN_TOOL,
         30,  
         2.0F, // Wood mining speed
-        1.0F, // Wood sword damage (matches vanilla)
+        1.0F, 
         15,   
         ItemTags.REPAIRS_WOODEN_DAGGER,
         3.0F, // Ranged damage
         1.4F  // Ranged velocity
     );
 
-    public static final DaggerToolMaterial GOLD = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
-        20,  
-        2.0F, //
-        1.0F, // 
-        25,  // Copper will be 20
-        ItemTags.REPAIRS_GOLDEN_DAGGER,
-        3.0F, // Ranged damage
-        1.6F  // Ranged velocity
-    );
 
     public static final DaggerToolMaterial STONE = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_STONE_TOOL,
@@ -123,6 +113,17 @@ public class DaggerToolMaterial {
         ItemTags.REPAIRS_IRON_DAGGER,
         7.0F, // Ranged damage
         1.8F // Ranged velocity
+    );
+
+    public static final DaggerToolMaterial GOLD = new DaggerToolMaterial(
+        BlockTags.INCORRECT_FOR_STONE_TOOL,
+        20,  
+        2.0F, //
+        1.0F, // 
+        25,  // Copper will be 20
+        ItemTags.REPAIRS_GOLDEN_DAGGER,
+        3.0F, // Ranged damage
+        1.6F  // Ranged velocity
     );
 
     public static final DaggerToolMaterial DIAMOND = new DaggerToolMaterial(
