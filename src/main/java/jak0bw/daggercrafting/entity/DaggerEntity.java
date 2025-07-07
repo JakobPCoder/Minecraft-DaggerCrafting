@@ -58,7 +58,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 
     private boolean approachingTargetSoundPlayed = false;
     private static final int APPROACH_SOUND_THRESHOLD_TICKS = 5;
-    private static final double RETURN_SPEED_MULTIPLIER = 0.1;
+    private static final double RETURN_SPEED_MULTIPLIER = 0.15;
 
 
 	public DaggerEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
@@ -67,22 +67,27 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
         System.out.println("DaggerEntity Constructor 1 entityType: " + entityType);
 	}
 
+	@SuppressWarnings("unchecked")
 	public DaggerEntity(World world, LivingEntity owner, ItemStack stack) {
-        super((EntityType<? extends PersistentProjectileEntity>)Registries.ENTITY_TYPE.get(Identifier.of(DaggerCrafting.MOD_ID, Registries.ITEM.getId(stack.getItem()).getPath())), owner, world, stack, (ItemStack)null);
+        super((EntityType<? extends PersistentProjectileEntity>)Registries.ENTITY_TYPE.get(getIdentifierFromStack(stack)), owner, world, stack, (ItemStack)null);
         System.out.println("DaggerEntity Constructor 2 stack: " + stack);
 		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
 		this.dataTracker.set(ENCHANTED, stack.hasGlint());
         System.out.println("DaggerEntity Constructor 2");
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public DaggerEntity(World world, double x, double y, double z, ItemStack stack) {
-		super((EntityType<? extends PersistentProjectileEntity>)Registries.ENTITY_TYPE.get(Identifier.of(DaggerCrafting.MOD_ID, Registries.ITEM.getId(stack.getItem()).getPath())), x, y, z, world, stack, (ItemStack)null);
+		super((EntityType<? extends PersistentProjectileEntity>)Registries.ENTITY_TYPE.get(getIdentifierFromStack(stack)), x, y, z, world, stack, (ItemStack)null);
         System.out.println("DaggerEntity Constructor 3 stack: " + stack);
 		this.dataTracker.set(LOYALTY, this.getLoyalty(stack));
 		this.dataTracker.set(ENCHANTED, stack.hasGlint());
         System.out.println("DaggerEntity Constructor 3");
 	}
 
+	private static Identifier getIdentifierFromStack(ItemStack stack) {
+		return Registries.ITEM.getId(stack.getItem());
+	}
 
     @Override
     public ItemStack getStack() {
@@ -165,7 +170,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
             double velocitySquared = this.getVelocity().lengthSquared();
             // Force sync more frequently as speed increases
             // Base threshold: 1.0 blocks/tick, increases sync frequency with speed
-            if (velocitySquared > 1.0) {
+            if (velocitySquared > 2.0) {
                 this.velocityModified = true; // Force position sync to clients
                 
                 // For very high speeds, force more frequent updates
@@ -246,15 +251,15 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 
 	protected void onBlockHitEnchantmentEffects(ServerWorld world, BlockHitResult blockHitResult, ItemStack weaponStack) {
 		Vec3d vec3d = blockHitResult.getBlockPos().clampToWithin(blockHitResult.getPos());
-		Entity var6 = this.getOwner();
-		LivingEntity var10002;
-		if (var6 instanceof LivingEntity livingEntity) {
-			var10002 = livingEntity;
+		Entity owner = this.getOwner();
+		LivingEntity user;
+		if (owner instanceof LivingEntity livingEntity) {
+			user = livingEntity;
 		} else {
-			var10002 = null;
+			user = null;
 		}
 
-		EnchantmentHelper.onHitBlock(world, weaponStack, var10002, this, (EquipmentSlot) null, vec3d,
+		EnchantmentHelper.onHitBlock(world, weaponStack, user, this, (EquipmentSlot) null, vec3d,
 				world.getBlockState(blockHitResult.getBlockPos()), (item) -> {
 					this.kill(world);
 				});
@@ -307,8 +312,8 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 	}
 
 	private byte getLoyalty(ItemStack stack) {
-		World var3 = this.getWorld();
-		if (var3 instanceof ServerWorld serverWorld) {
+		World world = this.getWorld();
+		if (world instanceof ServerWorld serverWorld) {
 			return (byte) MathHelper.clamp(EnchantmentHelper.getTridentReturnAcceleration(serverWorld, stack, this), 0,
 					127);
 		} else {
@@ -397,13 +402,18 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 	@Override
 	protected void knockback(LivingEntity target, DamageSource source) {
 		double baseKnockback = this.getWeaponStack() != null && this.getWorld() instanceof ServerWorld serverWorld
-			? EnchantmentHelper.modifyKnockback(serverWorld, this.getWeaponStack(), target, source, 1.0f)
+			? EnchantmentHelper.modifyKnockback(serverWorld, this.getWeaponStack(), target, source, 0.5f)
 			: 0.0F;
 		if (baseKnockback > 0.0) {
 			double resistanceFactor = Math.max(0.0, 1.0 - target.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.KNOCKBACK_RESISTANCE));
-			net.minecraft.util.math.Vec3d vec3d = this.getVelocity().multiply(baseKnockback * resistanceFactor * 0.1f);
-			if (vec3d.lengthSquared() > 0.0) {
-				target.addVelocity(vec3d.x, Math.max(0.1, vec3d.y + 0.1), vec3d.z);
+			// To ensure the squaring operation is invariant to negative numbers, we use absolute values before squaring.
+			// This guarantees that the directionality of the velocity does not affect the magnitude calculation,
+			// and the knockback force is always positive in magnitude, regardless of the sign of the velocity components.
+			Vec3d velocity = this.getVelocity();
+			velocity = new Vec3d(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y),velocity.z * Math.abs(velocity.z)).multiply(baseKnockback * resistanceFactor * 0.1f);
+			System.out.println("DaggerEntity knockback length: " + velocity.length());
+			if (velocity.lengthSquared() > 0.0) {
+				target.addVelocity(velocity.x, Math.max(0.05, velocity.y), velocity.z);
 			}
 		}
 	}
