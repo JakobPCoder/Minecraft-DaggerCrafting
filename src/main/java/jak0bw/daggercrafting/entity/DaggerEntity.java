@@ -34,10 +34,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import jak0bw.daggercrafting.DaggerCrafting;
+import jak0bw.daggercrafting.DaggerToolMaterial;
 import jak0bw.daggercrafting.ModEntities;
 import jak0bw.daggercrafting.ModItems;
 import jak0bw.daggercrafting.item.DaggerItem;
-import jak0bw.daggercrafting.item.DaggerToolMaterial;
 
 public class DaggerEntity extends PersistentProjectileEntity implements FlyingItemEntity{
 
@@ -410,7 +410,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 			// This guarantees that the directionality of the velocity does not affect the magnitude calculation,
 			// and the knockback force is always positive in magnitude, regardless of the sign of the velocity components.
 			Vec3d velocity = this.getVelocity();
-			velocity = new Vec3d(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y),velocity.z * Math.abs(velocity.z)).multiply(baseKnockback * resistanceFactor * 0.1f);
+			velocity = new Vec3d(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y),velocity.z * Math.abs(velocity.z)).multiply(baseKnockback * resistanceFactor * 0.15f);
 			System.out.println("DaggerEntity knockback length: " + velocity.length());
 			if (velocity.lengthSquared() > 0.0) {
 				target.addVelocity(velocity.x, Math.max(0.05, velocity.y), velocity.z);
