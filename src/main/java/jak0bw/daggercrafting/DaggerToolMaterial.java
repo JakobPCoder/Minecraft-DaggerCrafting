@@ -12,158 +12,168 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class DaggerToolMaterial {
-    // All vanilla ToolMaterial properties
+    /**
+     * The tag for blocks that are incorrect for this material.
+     */
     private final TagKey<Block> inverseTag;
-    private final int durability;
-    private final float miningSpeed;
-    private final float attackDamage;
-    private final int enchantability;
+    /**
+     * The tag for items that can repair this material.
+     */
     private final TagKey<Item> repairIngredientTag;
-    
-    // Our custom dagger-specific properties
+    /**
+     * The damage of the dagger when thrown.
+     */
     private final float rangedDamage;
+    /**
+     * The velocity of the dagger when thrown.
+     */
     private final float rangedVelocity;
-    
-    public DaggerToolMaterial(
-        TagKey<Block> inverseTag, 
-        int durability, 
-        float miningSpeed, 
-        float attackDamage, 
-        int enchantability, 
-        TagKey<Item> repairIngredientTag, 
-        float rangedDamage, 
-        float rangedVelocity
-        ) {
+    /**
+     * The damage of the dagger when used in melee combat. A base damage of 1.0 is added on top of this.
+     */
+    private final float attackDamage;
+    /**
+     * The mining speed of the dagger. 4.0 is the base value, whatever we put here is added/subtracted from this.
+     */
+    private final float miningSpeed;
+    /**
+     * The durability of the dagger.
+     */ 
+    private final int durability;
+    /**
+     * The enchantability of the dagger.
+     */
+    private final int enchantability;
 
+    /**
+     * A map of all registered dagger materials.
+     */
+    public static Map<String, DaggerToolMaterial> DAGGER_TOOL_MATERIALS = new LinkedHashMap<>();
+
+    /**
+     * Constructor for the DaggerToolMaterial class.
+     * @param inverseTag The tag for blocks that are incorrect for this material.
+     * @param repairIngredientTag The tag for items that can repair this material.
+     * @param rangedDamage The damage of the dagger when thrown.
+     * @param rangedVelocity The velocity of the dagger when thrown.
+     * @param attackDamage The damage of the dagger when used in melee combat.
+     * @param miningSpeed The mining speed of the dagger.
+     * @param durability The durability of the dagger.
+     * @param enchantability The enchantability of the dagger.
+     */
+    public DaggerToolMaterial(
+        TagKey<Block> inverseTag,
+        TagKey<Item> repairIngredientTag,
+        float rangedDamage,
+        float rangedVelocity,
+        float attackDamage,
+        float miningSpeed,
+        int durability,
+        int enchantability
+    ) {
         this.inverseTag = inverseTag;
-        this.durability = durability;
-        this.miningSpeed = miningSpeed;
-        this.attackDamage = attackDamage;
-        this.enchantability = enchantability;
         this.repairIngredientTag = repairIngredientTag;
         this.rangedDamage = rangedDamage;
         this.rangedVelocity = rangedVelocity;
+        this.attackDamage = attackDamage;
+        this.miningSpeed = miningSpeed;
+        this.durability = durability;
+        this.enchantability = enchantability;
     }
-
 
     // All getter methods for both vanilla compatibility and custom features
-    // Getter for inverseTag (incorrect blocks for drops)
-    public TagKey<Block> getInverseTag() {
-        return this.inverseTag;
-    }
-
-    // Getter for durability
-    public int getDurability() {
-        return this.durability;
-    }
-
-    // Getter for miningSpeed
-    public float getMiningSpeed() {
-        return this.miningSpeed;
-    }
-    // Getter for attackDamage
-    public float getAttackDamage() {
-        return this.attackDamage;
-    }
-
-    // Getter for enchantability
-    public int getEnchantability() {
-        return this.enchantability;
-    }
-
-    // Getter for repairIngredientTag
-    public TagKey<Item> getRepairIngredientTag() {
-        return this.repairIngredientTag;
-    }
-    // Getter for rangedDamage
-    public float getRangedDamage() {
-        return this.rangedDamage;
-    }
-
-    // Getter for rangedVelocity
-    public float getRangedVelocity() {
-        return this.rangedVelocity;
-    }
+    public TagKey<Block> getInverseTag() { return this.inverseTag; }
+    public TagKey<Item> getRepairIngredientTag() { return this.repairIngredientTag; }
+    public float getRangedDamage() { return this.rangedDamage; }
+    public float getRangedVelocity() { return this.rangedVelocity; }
+    public float getAttackDamage() { return this.attackDamage; }
+    public float getMiningSpeed() { return this.miningSpeed; }
+    public int getDurability() { return this.durability; }
+    public int getEnchantability() { return this.enchantability; }
 
 
-    public static final DaggerToolMaterial WOOD = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_WOODEN_TOOL,
-        30,  
-        2.0F, // Wood mining speed
-        1.0F, 
-        15,   
-        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_wooden_dagger")),
-        3.0F, // Ranged damage
-        1.4F  // Ranged velocity
-    );
-
-
-    public static final DaggerToolMaterial STONE = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
-        50,  
-        2.0F, 
-        2.0F, 
-        12,    
-        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_stone_dagger")),
-        5.0F, // Ranged damage
-        1.6F  // Ranged velocity
-    );
-
-    public static final DaggerToolMaterial IRON = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_IRON_TOOL,
-        100,   
-        2.0F, // 
-        3.0F, // 
-        11,     // steel will also be 11
-        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_iron_dagger")),
-        7.0F, // Ranged damage
-        1.8F // Ranged velocity
-    );
-
-
-
-    public static final DaggerToolMaterial GOLD = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_GOLD_TOOL,
-        20,  
-        2.0F, //
-        1.0F, // 
-        25,  // Copper will be 20
-        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_golden_dagger")),
-        3.0F, // Ranged damage
-        1.6F  // Ranged velocity
-    );
-
-    public static final DaggerToolMaterial DIAMOND = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
-        250,   
-        2.0F, // 
-        4.0F, // 
-        10,   
-        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_diamond_dagger")),
-        8.0F, // Ranged damage
-        2.0F  // Ranged velocity
-    );
-
-
-    public static final Map<String, DaggerToolMaterial> DAGGER_TOOL_MATERIALS;
-
-    static {
-        Map<String, DaggerToolMaterial> map = new LinkedHashMap<>();
-        map.put("wooden_dagger", WOOD);
-        map.put("stone_dagger", STONE);
-        map.put("iron_dagger", IRON);
-        map.put("golden_dagger", GOLD);
-        map.put("diamond_dagger", DIAMOND);
-        DAGGER_TOOL_MATERIALS = Map.copyOf(map);
-    }
 
     /**
-     * Gets the repair tag for a given dagger name (e.g., "iron_dagger").
-     * @param daggerName The full dagger name ("wooden_dagger", "iron_dagger", etc.)
-     * @return The TagKey for the repair ingredient, or null if not found.
+     * Registers a new dagger material with the given name, inverse tag, ranged damage, ranged velocity, attack damage, mining speed, durability, and enchantability.
+     * @param name The name of the dagger material.
+     * @param inverseTag The tag for blocks that are incorrect for this material.
+     * @param rangedDamage The damage of the dagger when thrown.
+     * @param rangedVelocity The velocity of the dagger when thrown.
+     * @param attackDamage The damage of the dagger when used in melee combat.
+     * @param miningSpeed The mining speed of the dagger.
+     * @param durability The durability of the dagger.
+     * @param enchantability The enchantability of the dagger.
+     * @return The registered dagger material.
      */
-    public static TagKey<Item> getRepairTag(String daggerName) {
-        DaggerToolMaterial mat = DAGGER_TOOL_MATERIALS.get(daggerName);
-        return mat != null ? mat.getRepairIngredientTag() : null;
+    public static DaggerToolMaterial registerDaggerMaterial(String name, TagKey<Block> inverseTag, float rangedDamage, float rangedVelocity, float attackDamage, float miningSpeed, int durability, int enchantability) {
+        DaggerToolMaterial material = new DaggerToolMaterial(
+            inverseTag,
+            TagKey.of(RegistryKeys.ITEM, Identifier.of(DaggerCrafting.MOD_ID, "repairs_" + name)),
+            rangedDamage,
+            rangedVelocity,
+            attackDamage,
+            miningSpeed,
+            durability,
+            enchantability
+        );
+        DAGGER_TOOL_MATERIALS.put(name, material);
+        return material;
     }
+
+    static {
+        registerDaggerMaterial(
+            "wooden_dagger",
+            BlockTags.INCORRECT_FOR_WOODEN_TOOL,
+            4.0F,
+            1.4F,
+            2.0F,
+            2.0F,
+            30,
+            15
+        );
+        registerDaggerMaterial(
+            "stone_dagger",
+            BlockTags.INCORRECT_FOR_STONE_TOOL,
+            6.0F,
+            1.6F,
+            3.0F,
+            2.0F,
+            50,
+            12
+        );
+        registerDaggerMaterial(
+            "iron_dagger",
+            BlockTags.INCORRECT_FOR_IRON_TOOL,
+            7.0F,
+            1.8F,
+            4.0F,
+            2.0F,
+            100,
+            11
+        );
+        registerDaggerMaterial(
+            "golden_dagger",
+            BlockTags.INCORRECT_FOR_GOLD_TOOL,
+            4.0F,
+            1.6F,
+            2.0F,
+            2.0F,
+            20,
+            25
+        );
+        registerDaggerMaterial(
+            "diamond_dagger",
+            BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
+            8.0F,
+            2.0F,
+            5.0F,
+            2.0F,
+            250,
+            10
+        );
+    }
+
+
+
+
 }
