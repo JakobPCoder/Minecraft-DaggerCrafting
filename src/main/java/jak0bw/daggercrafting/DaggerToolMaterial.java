@@ -1,9 +1,15 @@
-package jak0bw.daggercrafting.item;
+package jak0bw.daggercrafting;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 
 public class DaggerToolMaterial {
     // All vanilla ToolMaterial properties
@@ -79,15 +85,14 @@ public class DaggerToolMaterial {
         return this.rangedVelocity;
     }
 
-    // meele attack damage is + 1
-    
+
     public static final DaggerToolMaterial WOOD = new DaggerToolMaterial(
         BlockTags.INCORRECT_FOR_WOODEN_TOOL,
         30,  
         2.0F, // Wood mining speed
         1.0F, 
         15,   
-        ItemTags.REPAIRS_WOODEN_DAGGER,
+        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_wooden_dagger")),
         3.0F, // Ranged damage
         1.4F  // Ranged velocity
     );
@@ -99,42 +104,66 @@ public class DaggerToolMaterial {
         2.0F, 
         2.0F, 
         12,    
-        ItemTags.REPAIRS_STONE_DAGGER,
+        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_stone_dagger")),
         5.0F, // Ranged damage
         1.6F  // Ranged velocity
     );
 
     public static final DaggerToolMaterial IRON = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
+        BlockTags.INCORRECT_FOR_IRON_TOOL,
         100,   
         2.0F, // 
         3.0F, // 
         11,     // steel will also be 11
-        ItemTags.REPAIRS_IRON_DAGGER,
+        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_iron_dagger")),
         7.0F, // Ranged damage
         1.8F // Ranged velocity
     );
 
+
+
     public static final DaggerToolMaterial GOLD = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
+        BlockTags.INCORRECT_FOR_GOLD_TOOL,
         20,  
         2.0F, //
         1.0F, // 
         25,  // Copper will be 20
-        ItemTags.REPAIRS_GOLDEN_DAGGER,
+        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_golden_dagger")),
         3.0F, // Ranged damage
         1.6F  // Ranged velocity
     );
 
     public static final DaggerToolMaterial DIAMOND = new DaggerToolMaterial(
-        BlockTags.INCORRECT_FOR_STONE_TOOL,
+        BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
         250,   
         2.0F, // 
         4.0F, // 
         10,   
-        ItemTags.REPAIRS_DIAMOND_DAGGER,
+        TagKey.of(RegistryKeys.ITEM, Identifier.of("daggercrafting", "repairs_diamond_dagger")),
         8.0F, // Ranged damage
         2.0F  // Ranged velocity
     );
 
+
+    public static final Map<String, DaggerToolMaterial> DAGGER_TOOL_MATERIALS;
+
+    static {
+        Map<String, DaggerToolMaterial> map = new LinkedHashMap<>();
+        map.put("wooden_dagger", WOOD);
+        map.put("stone_dagger", STONE);
+        map.put("iron_dagger", IRON);
+        map.put("golden_dagger", GOLD);
+        map.put("diamond_dagger", DIAMOND);
+        DAGGER_TOOL_MATERIALS = Map.copyOf(map);
+    }
+
+    /**
+     * Gets the repair tag for a given dagger name (e.g., "iron_dagger").
+     * @param daggerName The full dagger name ("wooden_dagger", "iron_dagger", etc.)
+     * @return The TagKey for the repair ingredient, or null if not found.
+     */
+    public static TagKey<Item> getRepairTag(String daggerName) {
+        DaggerToolMaterial mat = DAGGER_TOOL_MATERIALS.get(daggerName);
+        return mat != null ? mat.getRepairIngredientTag() : null;
+    }
 }

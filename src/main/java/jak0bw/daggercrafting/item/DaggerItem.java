@@ -3,6 +3,7 @@ package jak0bw.daggercrafting.item;
 import jak0bw.daggercrafting.entity.DaggerEntity;
 import jak0bw.daggercrafting.ModEntities;
 import jak0bw.daggercrafting.DaggerCrafting;
+import jak0bw.daggercrafting.DaggerToolMaterial;
 import jak0bw.daggercrafting.ModEnchantments;
 
 import java.util.List;

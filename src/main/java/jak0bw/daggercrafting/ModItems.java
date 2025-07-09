@@ -1,7 +1,6 @@
 package jak0bw.daggercrafting;
 
 import jak0bw.daggercrafting.DaggerCrafting;
-import jak0bw.daggercrafting.item.DaggerToolMaterial;
 import jak0bw.daggercrafting.item.DaggerItem;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import net.minecraft.item.ItemGroups;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Handles registration and creative tab assignment for all SteelCrafting mod items.
@@ -47,41 +49,24 @@ public class ModItems {
         return item;
     }
 
-    // Diamond Arrow item
-    public static final Item WOODEN_DAGGER = registerItem(
-        "wooden_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.WOOD),
-        new Item.Settings(),
-        List.of(ItemGroups.COMBAT)
-    );
 
-    public static final Item STONE_DAGGER = registerItem(
-        "stone_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.STONE),
-        new Item.Settings(),
-        List.of(ItemGroups.COMBAT)
-    );
+    /**
+     * Map of dagger name (e.g., "wooden_dagger") to registered Item instance.
+     */
+    public static final Map<String, Item> DAGGER_ITEMS;
 
-    public static final Item IRON_DAGGER = registerItem(
-        "iron_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.IRON),
-        new Item.Settings(),
-        List.of(ItemGroups.COMBAT)
-    );
-
-    public static final Item GOLDEN_DAGGER = registerItem(
-        "golden_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.GOLD),
-        new Item.Settings(),
-        List.of(ItemGroups.COMBAT)
-    );
-
-    public static final Item DIAMOND_DAGGER = registerItem(
-        "diamond_dagger",
-        settings -> new DaggerItem(settings, DaggerToolMaterial.DIAMOND),
-        new Item.Settings(),
-        List.of(ItemGroups.COMBAT)
-    );
+    static {
+        Map<String, Item> map = new LinkedHashMap<>();
+        for (Map.Entry<String, DaggerToolMaterial> entry : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.entrySet()) {
+            map.put(entry.getKey(), registerItem(
+                entry.getKey(),
+                settings -> new DaggerItem(settings, entry.getValue()),
+                new Item.Settings(),
+                List.of(ItemGroups.COMBAT)
+            ));
+        }
+        DAGGER_ITEMS = Map.copyOf(map);
+    }
 
     /**
      * Registers all mod items to their respective creative tabs.

@@ -1,7 +1,6 @@
 package jak0bw.daggercrafting;
 
 import jak0bw.daggercrafting.entity.DaggerEntity;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -9,72 +8,52 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
- * Handles registration of custom entities for the SteelCrafting mod.
+ * Handles registration of custom dagger entities for the DaggerCrafting mod.
+ * Uses a static list of dagger type names and a static map for entity types, registered via a helper method.
  */
 public class ModEntities {
-    
     /**
-     * Wood Arrow Entity Type - extends ArrowEntity with increased damage
+     * Map of dagger entity type name to registered EntityType.
+     * Populated during mod initialization.
      */
-    public static final EntityType<DaggerEntity> WOODEN_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "wooden_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "wooden_dagger")))
-    );
+    public static final Map<String, EntityType<DaggerEntity>> DAGGER_ENTITY_TYPES = new LinkedHashMap<>();
 
-    public static final EntityType<DaggerEntity> STONE_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "stone_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "stone_dagger")))
-    );
 
-    public static final EntityType<DaggerEntity> GOLDEN_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "golden_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "golden_dagger")))
-    );
-
-    public static final EntityType<DaggerEntity> IRON_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "iron_dagger")))
-    );
-
-    public static final EntityType<DaggerEntity> DIAMOND_DAGGER = Registry.register(
-        Registries.ENTITY_TYPE,
-        Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger"),
-        EntityType.Builder.<DaggerEntity>create(DaggerEntity::new,  SpawnGroup.MISC)
-            .dimensions(0.5f, 0.5f)
-            .maxTrackingRange(4)
-            .trackingTickInterval(20)
-            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, "diamond_dagger")))
-    );
 
     /**
-     * Registers all mod entities.
+     * Helper to register a DaggerEntity type for a given name.
+     * @param name The dagger entity type name (e.g., "iron_dagger").
+     * @return The registered EntityType.
+     */
+    private static EntityType<DaggerEntity> registerDaggerEntityType(String name) {
+        return Registry.register(
+            Registries.ENTITY_TYPE,
+            Identifier.of(DaggerCrafting.MOD_ID, name),
+            EntityType.Builder.<DaggerEntity>create(DaggerEntity::new, SpawnGroup.MISC)
+                .dimensions(0.5f, 0.5f)
+                .maxTrackingRange(4)
+                .trackingTickInterval(20)
+                .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, name)))
+        );
+    }
+
+    /**
+     * Registers all dagger entity types and populates the DAGGER_ENTITY_TYPES map.
      * Should be called during mod initialization.
      */
     public static void registerModEntities() {
         DaggerCrafting.LOGGER.info("Registering Mod Entities for " + DaggerCrafting.MOD_ID);
-        // The entity is already registered above via the static field initialization
-        // This method just logs that registration has completed
+        for (String name : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.keySet()) {
+            DAGGER_ENTITY_TYPES.put(name, registerDaggerEntityType(name));
+        }
+        // Optionally, make the map unmodifiable after registration
+        // DAGGER_ENTITY_TYPES = Collections.unmodifiableMap(DAGGER_ENTITY_TYPES);
     }
 } 
