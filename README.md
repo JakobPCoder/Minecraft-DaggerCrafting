@@ -1,13 +1,14 @@
 # DaggerCrafting
 
+[LICENSE](LICENSE.md)
+
 DaggerCrafting is a Minecraft mod that introduces throwable daggers as a new weapon type, blending fast-paced melee and ranged combat. Each dagger's stats and behavior are determined by its material, offering new strategic options.
 Also its a lot of fun!
 
 ## Daggers
+Daggers are crafted using a stick and a piece of the corresponding material, placed diagonally in a crafting grid.
 
 ![Items](images/items.png)![Items](images/iron.png)
-
-
 
 ## Ranged Combat
 When holding and releasing the right mouse button, the dagger will be thrown, similar to tridents.
@@ -15,12 +16,8 @@ When holding and releasing the right mouse button, the dagger will be thrown, si
 - The **knockback** is based on the daggers current velocity in air, so it also scales with the dagger's material.
 
 
-
-
 ## Melee Combat
 When in the main hand, the dagger will work just like a sword, but with much less damage and a faster attack speed.
-
-
 
 ## Enchantments
 Daggers support the following vanilla enchantments:
@@ -60,13 +57,13 @@ Below you find a list of all daggers and their stats.
 
 ### Dagger Material Stats
 
-| Material        | Durability | Mining Speed | Attack Damage | Enchantability | Ranged Damage | Ranged Velocity |
-|----------------|------------|--------------|---------------|----------------|---------------|----------------|
-| Wooden Dagger  | 30         | 2.0          | 2.0           | 15             | 3.0           | 1.4            |
-| Stone Dagger   | 50         | 2.0          | 3.0           | 12             | 5.0           | 1.6            |
-| Iron Dagger    | 100        | 2.0          | 4.0           | 11             | 7.0           | 1.8            |
-| Golden Dagger  | 20         | 2.0          | 2.0           | 25             | 3.0           | 1.6            |
-| Diamond Dagger | 250        | 2.0          | 5.0           | 10             | 8.0           | 2.0            |
+| Material        | Ranged Damage | Ranged Velocity | Durability | Attack Damage | Attack Speed | Enchantability |
+|----------------|---------------|----------------|------------|---------------|--------------|----------------|
+| Wooden         | 3.0           | 1.4            | 30         | 2.0           | 2.0          | 15             |
+| Stone          | 5.0           | 1.6            | 50         | 3.0           | 2.0          | 12             |
+| Iron           | 7.0           | 1.8            | 100        | 4.0           | 2.0          | 11             |
+| Golden         | 3.0           | 1.6            | 20         | 2.0           | 2.0          | 25             |
+| Diamond        | 8.0           | 2.0            | 250        | 5.0           | 2.0          | 10             |
 
 
 ---
