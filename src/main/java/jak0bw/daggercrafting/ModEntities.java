@@ -33,14 +33,15 @@ public class ModEntities {
      * @return The registered EntityType.
      */
     private static EntityType<DaggerEntity> registerDaggerEntityType(String name) {
+        Identifier id = Identifier.of(DaggerCrafting.MOD_ID, name);
         return Registry.register(
             Registries.ENTITY_TYPE,
-            Identifier.of(DaggerCrafting.MOD_ID, name),
+            id,
             EntityType.Builder.<DaggerEntity>create(DaggerEntity::new, SpawnGroup.MISC)
                 .dimensions(0.5f, 0.5f)
                 .maxTrackingRange(4)
                 .trackingTickInterval(20)
-                .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(DaggerCrafting.MOD_ID, name)))
+                .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, id))
         );
     }
 
