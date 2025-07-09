@@ -23,7 +23,7 @@ public class ModEntities {
      * Map of dagger entity type name to registered EntityType.
      * Populated during mod initialization.
      */
-    public static final Map<String, EntityType<DaggerEntity>> DAGGER_ENTITY_TYPES = new LinkedHashMap<>();
+    public static final LinkedHashMap<String, EntityType<DaggerEntity>> DAGGER_ENTITY_TYPES = new LinkedHashMap<>();
 
 
 
@@ -54,7 +54,5 @@ public class ModEntities {
         for (String name : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.keySet()) {
             DAGGER_ENTITY_TYPES.put(name, registerDaggerEntityType(name));
         }
-        // Optionally, make the map unmodifiable after registration
-        // DAGGER_ENTITY_TYPES = Collections.unmodifiableMap(DAGGER_ENTITY_TYPES);
     }
 } 

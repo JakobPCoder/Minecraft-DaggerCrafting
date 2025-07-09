@@ -107,7 +107,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 		}
 		else {
 			System.out.println("getMaterialFromItem failed");
-			return DaggerToolMaterial.DIAMOND; // fallback to diamond if not a DaggerItem
+			return DaggerToolMaterial.DAGGER_TOOL_MATERIALS.get("diamond_dagger"); // fallback to diamond if not a DaggerItem
 		}
 	}
 
@@ -116,7 +116,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 	 * @return The DaggerToolMaterial
 	 */
 	public DaggerToolMaterial getMaterial() {
-		return this.material == null ? DaggerToolMaterial.DIAMOND : this.material;
+		return this.material == null ? DaggerToolMaterial.DAGGER_TOOL_MATERIALS.get("diamond_dagger") : this.material;
 	}
 
 	

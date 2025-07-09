@@ -123,7 +123,7 @@ public class DaggerToolMaterial {
         registerDaggerMaterial(
             "wooden_dagger",
             BlockTags.INCORRECT_FOR_WOODEN_TOOL,
-            3.0F,
+            4.0F,
             1.4F,
             2.0F,
             2.0F,
@@ -133,7 +133,7 @@ public class DaggerToolMaterial {
         registerDaggerMaterial(
             "stone_dagger",
             BlockTags.INCORRECT_FOR_STONE_TOOL,
-            5.0F,
+            6.0F,
             1.6F,
             3.0F,
             2.0F,
@@ -143,7 +143,7 @@ public class DaggerToolMaterial {
         registerDaggerMaterial(
             "iron_dagger",
             BlockTags.INCORRECT_FOR_IRON_TOOL,
-            6.0F,
+            7.0F,
             1.8F,
             4.0F,
             2.0F,
@@ -153,7 +153,7 @@ public class DaggerToolMaterial {
         registerDaggerMaterial(
             "golden_dagger",
             BlockTags.INCORRECT_FOR_GOLD_TOOL,
-            3.0F,
+            4.0F,
             1.6F,
             2.0F,
             2.0F,
@@ -163,7 +163,7 @@ public class DaggerToolMaterial {
         registerDaggerMaterial(
             "diamond_dagger",
             BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
-            7.0F,
+            8.0F,
             2.0F,
             5.0F,
             2.0F,
