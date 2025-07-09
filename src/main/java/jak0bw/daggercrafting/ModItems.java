@@ -58,6 +58,7 @@ public class ModItems {
     static {
         Map<String, Item> map = new LinkedHashMap<>();
         for (Map.Entry<String, DaggerToolMaterial> entry : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.entrySet()) {
+            System.out.println("Registering dagger item: " + entry.getKey());
             map.put(entry.getKey(), registerItem(
                 entry.getKey(),
                 settings -> new DaggerItem(settings, entry.getValue()),
@@ -65,7 +66,7 @@ public class ModItems {
                 List.of(ItemGroups.COMBAT)
             ));
         }
-        DAGGER_ITEMS = Map.copyOf(map);
+        DAGGER_ITEMS = map;
     }
 
     /**
