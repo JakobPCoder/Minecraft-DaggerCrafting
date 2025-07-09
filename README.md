@@ -61,11 +61,11 @@ Below you find a list of all daggers and their stats.
 
 | Material | Ranged Damage | Ranged Velocity | Durability | Attack Damage | Attack Speed | Enchantability | Notes |
 |---|---|---|---|---|---|---|---|
-| Wooden | 5.0 | 1.4 | 30 | 2.0 | 2.0 | 15 | Basic starting dagger. |
-| Stone | 7.0 | 1.6 | 50 | 3.0 | 2.0 | 12 | Improved damage over wood. |
-| Iron | 8.0 | 1.8 | 100 | 4.0 | 2.0 | 11 | Good all-around performer. |
-| Golden | 5.0 | 1.6 | 20 | 2.0 | 2.0 | 25 | Excellent for enchantments due to high enchantability, despite lower base damage. |
-| Diamond | 9.0 | 2.0 | 250 | 5.0 | 2.0 | 10 | Highest ranged damage and velocity, ideal for maximizing knockback and Loyalty returns. |
+| Wooden | 4.0 | 1.4 | 30 | 2.0 | 2.0 | 15 | Basic starting dagger. |
+| Stone | 6.0 | 1.6 | 50 | 3.0 | 2.0 | 12 | Improved damage over wood. |
+| Iron | 7.0 | 1.8 | 100 | 4.0 | 2.0 | 11 | Good all-around performer. |
+| Golden | 4.0 | 1.6 | 20 | 2.0 | 2.0 | 25 | Excellent for enchantments due to high enchantability, despite lower base damage. |
+| Diamond | 8.0 | 2.0 | 250 | 5.0 | 2.0 | 10 | Highest ranged damage and velocity, ideal for maximizing knockback and Loyalty returns. |
 
 
 ---
