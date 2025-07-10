@@ -302,7 +302,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
-		this.dealtDamage = nbt.getBoolean("DealtDamage");
+		this.dealtDamage = nbt.getBoolean("DealtDamage").orElse(false);
 		this.dataTracker.set(LOYALTY, this.getLoyalty(this.getItemStack()));
 	}
 
@@ -337,30 +337,6 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		return true;
 	}
 
-	/**
-	 * Override to provide better synchronization for high-speed projectiles.
-	 * This method ensures that fast-moving daggers send position updates more frequently
-	 * to prevent visual lag between client and server.
-	 */
-	@Override
-	public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
-		// Dynamic interpolation scaling based on velocity
-		double velocitySquared = this.getVelocity().lengthSquared();
-		double velocity = Math.sqrt(velocitySquared);
-		
-		// Scale interpolation steps inversely with velocity
-		// Faster projectiles need less interpolation for more responsive visuals
-		if (velocity > 1.0) {
-			// Reduce interpolation steps based on velocity
-			// At 2.0 blocks/tick: steps = interpolationSteps / 2
-			// At 4.0 blocks/tick: steps = interpolationSteps / 4
-			// At 8.0 blocks/tick: steps = interpolationSteps / 8
-			double reductionFactor = Math.max(1.0, velocity);
-			interpolationSteps = Math.max(1, (int)(interpolationSteps / reductionFactor));
-		}
-		
-		super.updateTrackedPositionAndAngles(x, y, z, yaw, pitch, interpolationSteps);
-	}
 
 	private void applyLinearReturnMotion(Entity target, int loyaltyLevel) {
 		Vec3d toTarget = target.getEyePos().subtract(this.getPos());
