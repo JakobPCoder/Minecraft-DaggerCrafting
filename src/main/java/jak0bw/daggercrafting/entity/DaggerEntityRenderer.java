@@ -11,7 +11,7 @@ import net.minecraft.client.render.entity.state.FlyingItemEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FlyingItemEntity;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -84,10 +84,13 @@ public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity>
         if (stack == null || stack.isEmpty()) 
             throw new IllegalStateException("DaggerEntityRenderer: Stack is null or empty");
       
+
+
+            
         this.itemModelManager.updateForNonLivingEntity(
             flyingItemEntityRenderState.itemRenderState, 
             stack, 
-            ModelTransformationMode.GROUND,
+            ItemDisplayContext.GROUND,
             entity
         );
     }

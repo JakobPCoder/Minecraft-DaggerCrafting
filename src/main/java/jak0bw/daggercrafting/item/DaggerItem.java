@@ -29,7 +29,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
 import net.minecraft.item.ProjectileItem;
-import net.minecraft.item.SwordItem;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.Registries;
@@ -320,24 +319,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 		}
 	}
 
-	/**
-	 * This method is invoked when the dagger makes a melee hit on a LivingEntity.
-	 * It's part of the standard Minecraft item interaction for melee weapons.
-	 *
-	 * **Purpose:**
-	 * - Returning `true` signals to the game that the hit event has been processed by this item.
-	 * - The actual damage dealt during melee combat is typically handled by the item's
-	 *   configured `ATTACK_DAMAGE` and `ATTACK_SPEED` attributes (defined in `applyDaggerSettings`).
-	 *   This method primarily serves as a callback point if additional effects were needed on hit.
-	 *
-	 * @param stack The ItemStack of the dagger.
-	 * @param target The LivingEntity that was hit in melee.
-	 * @param attacker The LivingEntity (player) that performed the melee attack.
-	 * @return True to indicate the hit was processed.
-	 */
-	public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		return true; // Indicate that the hit event was processed.
-	}
 
 	/**
 	 * This method is called after the dagger has successfully dealt damage to an entity in melee combat.
@@ -383,18 +364,14 @@ public class DaggerItem extends Item implements ProjectileItem {
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-		// Call the super method first to add all standard item tooltips (e.g., enchantments, attack damage/speed).
-		super.appendTooltip(stack, context, tooltip, type);
-
-		// Add custom tooltips specific to the dagger's thrown properties, making them visible to the player.
-		// These include "Ranged Damage" and "Ranged Velocity," which are derived from the dagger's material
-		// (e.g., `DaggerToolMaterial.DIAMOND` will have specific ranged stats).
-		// The translatable text keys (`item.daggercrafting.dagger.when_thrown`, etc.) refer to entries in the language files (`en_us.json`).
-		tooltip.add(Text.translatable("item.daggercrafting.dagger.when_thrown").formatted(Formatting.GRAY));
+	@Deprecated
+	public void appendTooltip(ItemStack stack, TooltipContext context, net.minecraft.component.type.TooltipDisplayComponent displayComponent, java.util.function.Consumer<net.minecraft.text.Text> textConsumer, TooltipType type) {
+		// Call the super method if you want to preserve vanilla tooltips
+		// (super.appendTooltip(stack, context, displayComponent, textConsumer, type);)
+		// Now add your custom tooltips using textConsumer.accept(...)
+		textConsumer.accept(net.minecraft.text.Text.translatable("item.daggercrafting.dagger.when_thrown").formatted(net.minecraft.util.Formatting.GRAY));
 		DaggerToolMaterial mat = this.getMaterial();
-		tooltip.add(Text.literal(" ").append(Text.translatable("item.daggercrafting.dagger.ranged_damage", mat.getRangedDamage()).formatted(Formatting.DARK_GREEN)));
-		tooltip.add(Text.literal(" ").append(Text.translatable("item.daggercrafting.dagger.ranged_velocity", mat.getRangedVelocity()).formatted(Formatting.DARK_GREEN)));
-
+		textConsumer.accept(net.minecraft.text.Text.literal(" ").append(net.minecraft.text.Text.translatable("item.daggercrafting.dagger.ranged_damage", mat.getRangedDamage()).formatted(net.minecraft.util.Formatting.DARK_GREEN)));
+		textConsumer.accept(net.minecraft.text.Text.literal(" ").append(net.minecraft.text.Text.translatable("item.daggercrafting.dagger.ranged_velocity", mat.getRangedVelocity()).formatted(net.minecraft.util.Formatting.DARK_GREEN)));
 	}
 }
