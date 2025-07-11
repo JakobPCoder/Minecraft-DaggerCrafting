@@ -347,7 +347,7 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		double maxspeed = Math.min(RETURN_SPEED_MULTIPLIER * baseSpeed * loyaltyLevel, distance);
 		double currentspeed = this.getVelocity().length();
 
-		double acceleration = 0.1 * baseSpeed * loyaltyLevel;
+		double acceleration = 0.05 * baseSpeed * loyaltyLevel;
 		double nextSpeed;
 		if (currentspeed < maxspeed) {
 			nextSpeed = Math.min(currentspeed + acceleration, maxspeed);
@@ -371,8 +371,10 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		Vec3d toTarget = target.getEyePos().subtract(this.getPos());
 		double distance = toTarget.length();
 		double speed = this.getVelocity().length();
-		if (speed < 0.0001) return Double.POSITIVE_INFINITY;
-		return distance / speed;
+		if (speed < 0.0001) 
+			return Double.POSITIVE_INFINITY;
+		else
+			return distance / speed;
 	}
 
 	@Override
@@ -382,11 +384,10 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 			: 0.0F;
 		if (baseKnockback > 0.0) {
 			double resistanceFactor = Math.max(0.0, 1.0 - target.getAttributeValue(net.minecraft.entity.attribute.EntityAttributes.KNOCKBACK_RESISTANCE));
-			// To ensure the squaring operation is invariant to negative numbers, we use absolute values before squaring.
-			// This guarantees that the directionality of the velocity does not affect the magnitude calculation,
-			// and the knockback force is always positive in magnitude, regardless of the sign of the velocity components.
 			Vec3d velocity = this.getVelocity();
-			velocity = new Vec3d(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y),velocity.z * Math.abs(velocity.z)).multiply(baseKnockback * resistanceFactor * 0.15f);
+			velocity = new Vec3d(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y),velocity.z * Math.abs(velocity.z));
+			velocity = velocity.multiply(baseKnockback * resistanceFactor * 0.15f);
+
 			System.out.println("DaggerEntity knockback length: " + velocity.length());
 			if (velocity.lengthSquared() > 0.0) {
 				target.addVelocity(velocity.x, Math.max(0.05, velocity.y), velocity.z);
