@@ -1,9 +1,12 @@
 {
+  "item.daggercrafting.golden_dagger": "Golden Dagger",
   "item.daggercrafting.wooden_dagger": "Wooden Dagger",
   "item.daggercrafting.stone_dagger": "Stone Dagger",
-  "item.daggercrafting.golden_dagger": "Golden Dagger",
+  "item.daggercrafting.copper_dagger": "Copper Dagger",
   "item.daggercrafting.iron_dagger": "Iron Dagger",
   "item.daggercrafting.diamond_dagger": "Diamond Dagger",
+  "item.daggercrafting.netherite_dagger": "Netherite Dagger",
+  
   "item.daggercrafting.dagger.when_thrown": "When thrown:",
   "item.daggercrafting.dagger.ranged_damage": "%s Ranged Damage",
   "item.daggercrafting.dagger.ranged_velocity": "%s Ranged Velocity",

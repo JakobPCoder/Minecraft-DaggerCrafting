@@ -110,7 +110,7 @@ public class DaggerToolMaterial {
             TagKey.of(RegistryKeys.ITEM, Identifier.of(DaggerCrafting.MOD_ID, "repairs_" + name)),
             rangedDamage,
             rangedVelocity,
-            attackDamage, // Changed from attackDamage - 1
+            attackDamage - 1,
             miningSpeed,
             durability,
             enchantability
@@ -124,7 +124,7 @@ public class DaggerToolMaterial {
             "golden_dagger",
             BlockTags.INCORRECT_FOR_GOLD_TOOL,
             4.0F,
-            1.7F, // Changed from 1.6F
+            1.7F,
             2.0F,
             2.0F,
             20,
@@ -134,21 +134,21 @@ public class DaggerToolMaterial {
             "wooden_dagger",
             BlockTags.INCORRECT_FOR_WOODEN_TOOL,
             4.0F,
-            1.5F, // Changed from 1.4F
+            1.5F,
             2.0F,
             2.0F,
             30,
-            15 // Changed from 14
+            15
         );
         registerDaggerMaterial(
             "stone_dagger",
             BlockTags.INCORRECT_FOR_STONE_TOOL,
-            5.0F, // Changed from 6.0F
+            5.0F,
             1.6F,
             3.0F,
             2.0F,
             50,
-            14 // Changed from 13
+            14
         );
         registerDaggerMaterial(
             "copper_dagger",
@@ -158,7 +158,7 @@ public class DaggerToolMaterial {
             2.0F,
             2.0F,
             70,
-            13 // Changed from 12
+            13
         );
         registerDaggerMaterial(
             "iron_dagger",
@@ -180,7 +180,6 @@ public class DaggerToolMaterial {
             250,
             10
         );
-
         registerDaggerMaterial(
             "netherite_dagger",
             BlockTags.INCORRECT_FOR_NETHERITE_TOOL,

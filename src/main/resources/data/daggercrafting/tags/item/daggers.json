@@ -1,10 +1,12 @@
 {
   "replace": false,
   "values": [
+    "daggercrafting:golden_dagger",
     "daggercrafting:wooden_dagger",
     "daggercrafting:stone_dagger",
-    "daggercrafting:golden_dagger",
+    "daggercrafting:copper_dagger",
     "daggercrafting:iron_dagger",
-    "daggercrafting:diamond_dagger"
+    "daggercrafting:diamond_dagger",
+    "daggercrafting:netherite_dagger"
   ]
 } 

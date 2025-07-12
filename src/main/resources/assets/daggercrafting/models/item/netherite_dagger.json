@@ -1,0 +1,6 @@
+{
+    "parent": "daggercrafting:item/dagger",
+    "textures": {
+        "layer0": "daggercrafting:item/netherite_dagger"
+    }
+} 
