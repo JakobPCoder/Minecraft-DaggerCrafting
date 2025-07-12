@@ -147,53 +147,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 	}
 
 	/**
-	 * This is the central method that orchestrates what happens when a player *finishes* using the dagger.
-	 * This method is invoked when:
-	 * 1. The player releases the right-click button (the most common scenario for "throwing").
-	 * 2. The item's `getMaxUseTime` is reached (less relevant here due to the very high value, but part of the vanilla item use loop).
-	 *
-	 * The entire logic, variable naming conventions, and flow within this method are intentionally
-	 * mirrored from Minecraft's vanilla `TridentItem`'s `onStoppedUsing` method. This approach
-	 * minimizes unexpected behavior and ensures compatibility with vanilla enchantment and physics systems
-	 * (especially for Riptide).
-	 *
-	 * **Detailed Item Use Loop & Brainstormed Options:**
-	 * When a player right-clicks a dagger:
-	 *   - The `use()` method (further below) is called first. It performs initial checks and sets the player's current hand.
-	 *   - The game continuously tracks how long the item is being "used" based on `getMaxUseTime`.
-	 *   - When the player *releases* right-click (or `getMaxUseTime` is hit), `onStoppedUsing` is called.
-	 *
-	 * Within `onStoppedUsing`, the following scenarios are handled:
-	 *
-	 * **1. Initial Guard Clauses (Early Exits):**
-	 *    - **`user instanceof PlayerEntity`**: Ensures only actual players can trigger the dagger's special abilities. Mobs holding daggers will not throw them this way.
-	 *    - **`chargeTime < 10`**: Checks if the player held the button for at least 10 ticks (0.5 seconds). This is a crucial "charge-up" mechanic. If the dagger is merely "tapped" or clicked too quickly, it prevents accidental throws. This creates a deliberate feel, similar to drawing a bow.
-	 *    - **Riptide Environmental Check (`riptideLevel > 0.0F && !playerEntity.isTouchingWaterOrRain()`):**
-	 *      If the dagger has the Riptide enchantment, it *requires* the player to be in water or rain to activate. If Riptide is present but these environmental conditions aren't met, the action is cancelled. This prevents players from "Riptiding" on land without water, which is a vanilla trident behavior.
-	 *    - **Durability Check (`stack.willBreakNextUse()`):**
-	 *      If the dagger has only one durability point left, attempting to use it would break it. This check prevents the item from being used on its last durability, preserving the broken item rather than consuming it. This is a design choice to allow players to repair almost-broken daggers.
-	 *
-	 * **2. Core Logic (Server-Side Execution):**
-	 *    - **Sound Event Retrieval (`throwSound`)**: Determines which sound to play (e.g., normal throw sound, or a specific Riptide sound if applicable).
-	 *    - **Statistics Tracking**: Updates the player's "items used" statistic, a standard Minecraft interaction.
-	 *    - **Server-Side Gate (`world instanceof ServerWorld`)**: This is paramount for multiplayer consistency. All actions that alter game state (spawning entities, damaging items, applying velocity) MUST occur on the logical server to prevent desynchronization between clients and server, and to prevent cheating.
-	 *    - **Durability Damage**: The dagger loses 1 durability point upon use (whether thrown or Riptide-launched), consistent with tridents.
-	 *
-	 * **3. Branching Behavior (Normal Throw vs. Riptide Launch):**
-	 *    - **Normal Throw (`riptideLevel == 0.0F`):**
-	 *        - **DaggerEntity Spawning**: A new `DaggerEntity` (our custom projectile) is created and launched from the player.
-	 *          - `DaggerEntity.spawnWithVelocity(...)`: This helper handles the complex task of creating the entity, setting its initial position (from player), and applying the initial velocity based on the dagger's material (`this.material.getRangedVelocity()`). The 0.0F pitch and inaccuracy values mean it flies straight ahead without initial vertical angle or random deviation.
-	 *        - **Item Consumption (Survival) / Retention (Creative)**:
-	 *          - **Survival Players**: The dagger is removed from the player's inventory, simulating a traditional throw where the item is "used up."
-	 *          - **Creative Players**: The dagger remains in the player's inventory, and the thrown `DaggerEntity` is marked `PickupPermission.CREATIVE_ONLY`, allowing only creative players to retrieve it. This mirrors vanilla behavior for items like tridents in creative mode.
-	 *        - **Sound Playback**: The appropriate throwing sound is played at the dagger's spawn location.
-	 
-	
-	 * **4. Final Return Values:**
-	 *    - `return true;`: Indicates that the item's use was successfully processed (either a throw or a Riptide launch).
-	 *    - `return false;`: Indicates that the use was cancelled due to insufficient charge, environmental conditions, or durability.
-	 *    - The final `else { return false; }` at the very end is a catch-all for cases where the user is not a player, ensuring non-player entities cannot trigger these special item mechanics.
-	 *
+	 * This method is called when a player *stops* using the dagger (e.g., releases the right-click button).	
 	 * @param stack The ItemStack of the dagger being used.
 	 * @param world The World the action is taking place in (server-side for throwing).
 	 * @param user The LivingEntity (PlayerEntity) that stopped using the dagger.
@@ -215,10 +169,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 				if (stack.willBreakNextUse()) {
 					return false; // Prevent breaking on use; preserve the broken dagger.
 				} else {
-					// Retrieve the specific sound event to play when the dagger is used. This can be
-					// overridden by enchantments (like Riptide changing the sound from a normal throw).
-					RegistryEntry<SoundEvent> throwSound = (RegistryEntry)EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.TRIDENT_SOUND).orElse(SoundEvents.ITEM_TRIDENT_THROW);
-					
 					// Increment the player's statistics for using this item. This is a standard Minecraft mechanic.
 					playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
 					

@@ -58,14 +58,14 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 
 ## Stats
 
-***
 
-| **Material** | **Ranged Damage** | **Ranged Velocity** | **Durability** | **Melee Damage** | **Attack Speed** | **Enchantability** |
-| -------- |------------- |--------------- |---------- |------------- |------------ |-------------- |
-| Wooden |4.0 |1.4 |30 |2.0 |2.0 |15 |
-| Stone |6.0 |1.6 |50 |3.0 |2.0 |12 |
-| Iron |7.0 |1.8 |100 |4.0 |2.0 |11 |
-| Golden |4.0 |1.6 |20 |2.0 |2.0 |25 |
-| Diamond |8.0 |2.0 |250 |5.0 |2.0 |10 |
-
-***
+| **Material** | **Ranged Damage** | **Ranged Velocity** | **Durability** | **Melee Damage** | **Enchantability** |
+| -------- |------------- |--------------- |---------- |------------- |-------------- |
+| Golden |4 |**1.7** |20 |2 |**25** |
+| Wooden |4 |1.5 |30 |2 |15 |
+| Stone |5 |1.6 |50 |3 |14 |
+| Copper |6 |1.7 |70 |2 |13 |
+| Iron |7 |1.8 |100 |4 |11 |
+| Diamond |8 |**2.0** |250 |5 |10 |
+| Netherite |9 |**2.0** |500 |6 |15 |
+---

@@ -110,7 +110,7 @@ public class DaggerToolMaterial {
             TagKey.of(RegistryKeys.ITEM, Identifier.of(DaggerCrafting.MOD_ID, "repairs_" + name)),
             rangedDamage,
             rangedVelocity,
-            attackDamage,
+            attackDamage, // Changed from attackDamage - 1
             miningSpeed,
             durability,
             enchantability
@@ -121,24 +121,44 @@ public class DaggerToolMaterial {
 
     static {
         registerDaggerMaterial(
+            "golden_dagger",
+            BlockTags.INCORRECT_FOR_GOLD_TOOL,
+            4.0F,
+            1.7F, // Changed from 1.6F
+            2.0F,
+            2.0F,
+            20,
+            25
+        );
+        registerDaggerMaterial(
             "wooden_dagger",
             BlockTags.INCORRECT_FOR_WOODEN_TOOL,
             4.0F,
-            1.4F,
+            1.5F, // Changed from 1.4F
             2.0F,
             2.0F,
             30,
-            15
+            15 // Changed from 14
         );
         registerDaggerMaterial(
             "stone_dagger",
             BlockTags.INCORRECT_FOR_STONE_TOOL,
-            6.0F,
+            5.0F, // Changed from 6.0F
             1.6F,
             3.0F,
             2.0F,
             50,
-            12
+            14 // Changed from 13
+        );
+        registerDaggerMaterial(
+            "copper_dagger",
+            BlockTags.INCORRECT_FOR_STONE_TOOL,
+            6.0F,
+            1.7F,
+            2.0F,
+            2.0F,
+            70,
+            13 // Changed from 12
         );
         registerDaggerMaterial(
             "iron_dagger",
@@ -151,16 +171,6 @@ public class DaggerToolMaterial {
             11
         );
         registerDaggerMaterial(
-            "golden_dagger",
-            BlockTags.INCORRECT_FOR_GOLD_TOOL,
-            4.0F,
-            1.6F,
-            2.0F,
-            2.0F,
-            20,
-            25
-        );
-        registerDaggerMaterial(
             "diamond_dagger",
             BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
             8.0F,
@@ -169,6 +179,17 @@ public class DaggerToolMaterial {
             2.0F,
             250,
             10
+        );
+
+        registerDaggerMaterial(
+            "netherite_dagger",
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL,
+            9.0F,
+            2.0F,
+            6.0F,
+            2.0F,
+            500,
+            15
         );
     }
 
