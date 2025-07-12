@@ -16,7 +16,7 @@ DaggerCrafting transcends traditional weapon types, offering a unique blended co
 
 Daggers are crafted using a stick and a piece of the corresponding material, placed diagonally in a crafting grid.
 
-![Items](images/items.png)![Items](images/iron.png)
+![Items](images/items.png)![Items](images/iron.png)![Items](images/netherite.png)
 
 ## Ranged Combat
 
@@ -64,7 +64,7 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 | Golden |4 |**1.7** |20 |2 |**25** |
 | Wooden |4 |1.5 |30 |2 |15 |
 | Stone |5 |1.6 |50 |3 |14 |
-| Copper |6 |1.7 |70 |2 |13 |
+| Copper |6 |1.7 |70 |3 |13 |
 | Iron |7 |1.8 |100 |4 |11 |
 | Diamond |8 |**2.0** |250 |5 |10 |
 | Netherite |9 |**2.0** |500 |6 |15 |
