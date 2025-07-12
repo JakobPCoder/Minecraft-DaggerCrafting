@@ -25,14 +25,6 @@
 			"jak0bw.daggercrafting.DaggerCraftingClient"
 		]
 	},
-	"built_in_datapacks": [
-		{
-			"name": "DaggerCraftingPack",
-			"description": "Built-in enchantment overrides for dagger support",
-			"path": "data",
-			"default_enabled": true
-		}
-	],
 	"mixins": [
 		"daggercrafting.mixins.json"
 	],
