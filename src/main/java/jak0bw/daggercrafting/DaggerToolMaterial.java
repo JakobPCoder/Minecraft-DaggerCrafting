@@ -156,7 +156,7 @@ public class DaggerToolMaterial {
             6.0F,
             1.7F,
             2.0F,
-            2.0F,
+            3.0F,
             70,
             13
         );
