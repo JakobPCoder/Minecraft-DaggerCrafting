@@ -11,9 +11,11 @@ public class DaggerCraftingClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("DaggerCrafting client initialized");
+        LOGGER.info("DaggerCrafting: Registering DaggerEntityRenderers");
         for (String name : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.keySet()) {
             EntityRendererRegistry.register(ModEntities.DAGGER_ENTITY_TYPES.get(name), DaggerEntityRenderer::new);
         }
+
+        LOGGER.info("DaggerCrafting client initialized");
     }
 } 

@@ -4,7 +4,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
 
 public class ModEnchantments {
 	public static final RegistryKey<Enchantment> THROWING_SPEED = of("throwing_speed");
