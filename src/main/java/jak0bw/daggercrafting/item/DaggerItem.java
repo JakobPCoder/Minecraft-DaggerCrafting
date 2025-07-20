@@ -66,6 +66,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 
 	private final DaggerToolMaterial material;
 
+	private static final Identifier throwingSpeedId = Identifier.of(DaggerCrafting.MOD_ID, "throwing_speed");
 
 	/**
 	 * Helper method to apply sword-like settings for daggers, using DaggerToolMaterial.
@@ -164,22 +165,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 			// A higher 'chargeTime' means the dagger was held longer.
 			int chargeTime = this.getMaxUseTime(stack, user) - remainingUseTicks;
 
-			// Calculate charge force using linear interpolation between MIN_CHARGE_FACTOR and 1.0
-			// based on how long the dagger was charged relative to FULL_CHARGE_TICKS
-			float charge_force;
-			if (chargeTime >= FULL_CHARGE_TICKS) {
-				// Fully charged - maximum force
-				charge_force = 1.0f;
-			} else if (chargeTime <= MIN_THROW_TICKS) {
-				// Minimum charge - minimum force
-				charge_force = MIN_CHARGE_FACTOR;
-			} else {
-				// Linear interpolation between MIN_CHARGE_FACTOR and 1.0
-				// based on charge time between MIN_THROW_TICKS and FULL_CHARGE_TICKS
-				float chargeProgress = (float)(chargeTime - MIN_THROW_TICKS) / (float)(FULL_CHARGE_TICKS - MIN_THROW_TICKS);
-				charge_force = MathHelper.lerp(chargeProgress, MIN_CHARGE_FACTOR, 1.0f);
-			}
-			
+
 			// If the dagger was held for less than 10 ticks, it's considered an accidental click
 			// or an insufficient charge. In this case, the throwing action is cancelled.
 			if (chargeTime < MIN_THROW_TICKS) {
@@ -187,7 +173,23 @@ public class DaggerItem extends Item implements ProjectileItem {
 			} else {
 				if (stack.willBreakNextUse()) {
 					return false; // Prevent breaking on use; preserve the broken dagger.
-				} else {
+				} else {		
+					// Calculate charge force using linear interpolation between MIN_CHARGE_FACTOR and 1.0
+					// based on how long the dagger was charged relative to FULL_CHARGE_TICKS
+					float charge_force;
+					if (chargeTime >= FULL_CHARGE_TICKS) {
+						// Fully charged - maximum force
+						charge_force = 1.0f;
+					} else if (chargeTime <= MIN_THROW_TICKS) {
+						// Minimum charge - minimum force
+						charge_force = MIN_CHARGE_FACTOR;
+					} else {
+						// Linear interpolation between MIN_CHARGE_FACTOR and 1.0
+						// based on charge time between MIN_THROW_TICKS and FULL_CHARGE_TICKS
+						float chargeProgress = (float)(chargeTime - MIN_THROW_TICKS) / (float)(FULL_CHARGE_TICKS - MIN_THROW_TICKS);
+						charge_force = MathHelper.lerp(chargeProgress, MIN_CHARGE_FACTOR, 1.0f);
+					}
+					
 					// Increment the player's statistics for using this item. This is a standard Minecraft mechanic.
 					playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
 					
@@ -204,8 +206,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 						// Apply charge force multiplier to the base speed
 						speed *= charge_force;
 
-						// Get the level of the throwing speed enchantment
-						Identifier throwingSpeedId = Identifier.of(DaggerCrafting.MOD_ID, "throwing_speed");
 						RegistryEntry<Enchantment> throwingSpeedEnchantment = serverWorld.getRegistryManager()
 							.getOrThrow(RegistryKeys.ENCHANTMENT)
 							.getEntry(throwingSpeedId)
@@ -218,12 +218,10 @@ public class DaggerItem extends Item implements ProjectileItem {
 							float multiplier = 1.5f;
 							multiplier += (throwingSpeedLevel - 1) * 0.25f;
 							speed *= multiplier;
-							// No cap - let the synchronization system handle any speed dynamically
 						}
 
-
-						float heightOffset = 0.2f;
-						float pitchOffset = 3.0f / speed;
+						// float heightOffset = 0.2f;
+						// float pitchOffset = 3.0f / speed;
 						// playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() + heightOffset, playerEntity.getZ());
 						// playerEntity.setPitch(playerEntity.getPitch() - pitchOffset);
 
