@@ -43,8 +43,17 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 
     private static final TrackedData<Byte> LOYALTY;
     private static final TrackedData<Boolean> ENCHANTED;
+    
+    // Charge mechanics constants
+    private static final int MIN_THROW_TICKS = 5;  // Minimum ticks required to throw
+    private static final int FULL_CHARGE_TICKS = 20;  // Ticks to reach full charge
+    private static final float MIN_CHARGE_FACTOR = 0.3f;  // Minimum output factor (0.3 = 30% of max speed)
+    
     public String itemId;
     public float seconds;
+    
+    // Charge force variable to store the calculated charge value
+    public float charge_force;
 
 	/**
 	 * Whether the dagger has dealt damage.

@@ -7,7 +7,6 @@
 
 ### Fixed
 - Fixed copper dagger melee damage scaling- Now does 3 instead of 2 melee damage.
-- Fixed netherite dagger melee damage scaling- Now does 5 instead of 4 melee damage.
 
 
 ## [1.1.0] 
