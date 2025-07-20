@@ -58,8 +58,11 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 
 
 public class DaggerItem extends Item implements ProjectileItem {
-	public static final int MIN_DRAW_DURATION = 10;
 	private static final float ATTACK_SPEED = -2.0F;
+	// Charge mechanics constants
+	private static final int MIN_THROW_TICKS = 5;  // Minimum ticks required to throw
+	private static final int FULL_CHARGE_TICKS = 20;  // Ticks to reach full charge
+	private static final float MIN_CHARGE_FACTOR = 0.3f;  // Minimum output factor (0.3 = 30% of max speed)
 
 	private final DaggerToolMaterial material;
 
@@ -160,10 +163,26 @@ public class DaggerItem extends Item implements ProjectileItem {
 			// Calculate the actual duration the player held down the right-click button.
 			// A higher 'chargeTime' means the dagger was held longer.
 			int chargeTime = this.getMaxUseTime(stack, user) - remainingUseTicks;
+
+			// Calculate charge force using linear interpolation between MIN_CHARGE_FACTOR and 1.0
+			// based on how long the dagger was charged relative to FULL_CHARGE_TICKS
+			float charge_force;
+			if (chargeTime >= FULL_CHARGE_TICKS) {
+				// Fully charged - maximum force
+				charge_force = 1.0f;
+			} else if (chargeTime <= MIN_THROW_TICKS) {
+				// Minimum charge - minimum force
+				charge_force = MIN_CHARGE_FACTOR;
+			} else {
+				// Linear interpolation between MIN_CHARGE_FACTOR and 1.0
+				// based on charge time between MIN_THROW_TICKS and FULL_CHARGE_TICKS
+				float chargeProgress = (float)(chargeTime - MIN_THROW_TICKS) / (float)(FULL_CHARGE_TICKS - MIN_THROW_TICKS);
+				charge_force = MathHelper.lerp(chargeProgress, MIN_CHARGE_FACTOR, 1.0f);
+			}
 			
 			// If the dagger was held for less than 10 ticks, it's considered an accidental click
 			// or an insufficient charge. In this case, the throwing action is cancelled.
-			if (chargeTime < 5) {
+			if (chargeTime < MIN_THROW_TICKS) {
 				return false; // Not charged enough, prevent throw or Riptide.
 			} else {
 				if (stack.willBreakNextUse()) {
@@ -181,6 +200,9 @@ public class DaggerItem extends Item implements ProjectileItem {
 						stack.damage(1, playerEntity);
 						
 						float speed = this.material.getRangedVelocity();
+
+						// Apply charge force multiplier to the base speed
+						speed *= charge_force;
 
 						// Get the level of the throwing speed enchantment
 						Identifier throwingSpeedId = Identifier.of(DaggerCrafting.MOD_ID, "throwing_speed");
