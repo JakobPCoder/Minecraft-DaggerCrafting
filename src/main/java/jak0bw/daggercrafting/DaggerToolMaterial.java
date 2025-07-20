@@ -10,6 +10,19 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
+
+/**
+ * The DaggerToolMaterial class is used to define the properties of a dagger tool material.
+ * 
+ * @param inverseTag The tag for blocks that are incorrect for this material.
+ * @param repairIngredientTag The tag for items that can repair this material.
+ * @param rangedDamage The damage of the dagger when thrown.
+ * @param rangedVelocity The velocity of the dagger when thrown.
+ * @param attackDamage The damage of the dagger when used in melee combat.
+ * @param miningSpeed The mining speed of the dagger.
+ * @param durability The durability of the dagger.
+ * @param enchantability The enchantability of the dagger.
+ */
 public class DaggerToolMaterial {
     /**
      * The tag for blocks that are incorrect for this material.
@@ -155,7 +168,7 @@ public class DaggerToolMaterial {
             BlockTags.INCORRECT_FOR_STONE_TOOL,
             6.0F,
             1.7F,
-            2.0F,
+            3.0F,
             3.0F,
             70,
             13

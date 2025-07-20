@@ -58,15 +58,21 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 
 
 public class DaggerItem extends Item implements ProjectileItem {
+	// Vanilla attack speed modifier
 	private static final float ATTACK_SPEED = -2.0F;
-	// Charge mechanics constants
-	private static final int MIN_THROW_TICKS = 5;  // Minimum ticks required to throw
-	private static final int FULL_CHARGE_TICKS = 20;  // Ticks to reach full charge
-	private static final float MIN_CHARGE_FACTOR = 0.3f;  // Minimum output factor (0.3 = 30% of max speed)
 
+	// Charge mechanics constants
+	private static final int MIN_THROW_TICKS = 3;  // Minimum ticks required to throw
+	private static final int FULL_CHARGE_TICKS = 13;  // Ticks to reach full charge
+	private static final float MIN_CHARGE_FACTOR = 0.3f;  // Minimum output factor (0.3 = 30% of max speed)
+	private static final float MAX_PITCH_OFFSET = 5.0f;
+
+	// Throwing speed enchantment ID to check against enchantments on thrown daggers
+	private static final Identifier throwingSpeedId = Identifier.of(DaggerCrafting.MOD_ID, "throwing_speed");
+
+	// Material of the dagger
 	private final DaggerToolMaterial material;
 
-	private static final Identifier throwingSpeedId = Identifier.of(DaggerCrafting.MOD_ID, "throwing_speed");
 
 	/**
 	 * Helper method to apply sword-like settings for daggers, using DaggerToolMaterial.
@@ -220,16 +226,13 @@ public class DaggerItem extends Item implements ProjectileItem {
 							speed *= multiplier;
 						}
 
-						// float heightOffset = 0.2f;
-						// float pitchOffset = 3.0f / speed;
-						// playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() + heightOffset, playerEntity.getZ());
-						// playerEntity.setPitch(playerEntity.getPitch() - pitchOffset);
+						// Aim up based on speed to compensate for gravity
+						float pitchOffset = MAX_PITCH_OFFSET / Math.max(Math.min(speed, MAX_PITCH_OFFSET), 1.0f);
 
+						playerEntity.setPitch(playerEntity.getPitch() - pitchOffset);
 						DaggerEntity daggerEntity = (DaggerEntity)(DaggerEntity.spawnWithVelocity(DaggerEntity::new, serverWorld, stack, playerEntity, 0.0F, speed, 0.0F));
 						System.out.println("DaggerItem onStoppedUsing daggerEntity: " + daggerEntity.getItemStack()); // Debug print for the thrown dagger
-
-						// playerEntity.setPitch(playerEntity.getPitch() + pitchOffset);
-						// playerEntity.setPosition(playerEntity.getX(), playerEntity.getY() - heightOffset, playerEntity.getZ());
+						playerEntity.setPitch(playerEntity.getPitch() + pitchOffset);
 
 						// If the player is in creative mode, the dagger is not removed from their inventory,
 						// and the thrown entity can only be picked up by creative players.
