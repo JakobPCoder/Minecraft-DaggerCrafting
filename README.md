@@ -23,7 +23,8 @@ Daggers are crafted using a stick and a piece of the corresponding material, pla
 When holding and releasing the right mouse button, the dagger will be thrown, similar to tridents.
 
 *   The **damage** the dagger deals on impact and the **speed** with which the dagger is thrown are based on the dagger's material.
-*   The **knockback**: Knockback is essential for repeated attacks with a dagger, so _Creepers_ etc. are kept at range. The force of a dagger's **knockback** is directly proportional to its **velocity** when it hits a target. This means daggers thrown with greater initial speed (due to their **material** or the **Throwing Speed** enchantment) will send enemies flying further!
+*   The dagger is thrown with a **speed** based on the **material**, its **throwing speed enchantment** and the **draw/charge time**.
+*   The **knockback**: Knockback is essential for repeated attacks with a dagger, so _Creepers_ etc. are kept at range. The force of a dagger's **knockback** is directly proportional to its **velocity** when it hits a target. This means daggers thrown with greater initial speed will send enemies flying further!
 
 ## Melee Combat
 
