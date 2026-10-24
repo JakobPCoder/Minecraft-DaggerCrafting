@@ -4,6 +4,9 @@ import jak0bw.daggercrafting.DaggerCrafting;
 import jak0bw.daggercrafting.DaggerToolMaterial;
 import jak0bw.daggercrafting.item.DaggerItem;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -17,7 +20,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -192,6 +194,15 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		return this.dealtDamage ? null : super.findHitEntity(currentPosition, nextPosition);
 	}
 
+	/**
+	 * Tridents are not piercing arrows: collide with at most one entity per step.
+	 */
+	@Override
+	protected Collection<EntityHitResult> findHitEntities(Vec3 currentPosition, Vec3 nextPosition) {
+		EntityHitResult hit = this.findHitEntity(currentPosition, nextPosition);
+		return hit != null ? List.of(hit) : List.of();
+	}
+
 	public DaggerToolMaterial getMaterial() {
 		Item itemRef = this.getPickupItemStackOrigin().getItem();
 		return DaggerItem.getMaterialFromItem(itemRef);
@@ -211,11 +222,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		}
 
 		this.dealtDamage = true;
-		if (targetEntity.hurtOrSimulate(damageSource, damageAmount)) {
-			if (targetEntity.is(EntityTypes.ENDERMAN)) {
-				return;
-			}
-
+		boolean wasHurt = targetEntity.hurtOrSimulate(damageSource, damageAmount);
+		if (wasHurt) {
 			if (this.level() instanceof ServerLevel serverLevel) {
 				EnchantmentHelper.doPostAttackEffectsWithItemSourceOnBreak(
 					serverLevel,
@@ -236,9 +244,11 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			living.igniteForSeconds(4);
 		}
 
-		// ThrownTrident now passes the bounce scale into deflect instead of multiplying after.
-		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
-		this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
+		// Endermen and similar targets opt out here instead of an EntityTypes.ENDERMAN early return.
+		if (targetEntity.projectileReceivesSideEffectsOnHit(wasHurt)) {
+			this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
+			this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
+		}
 	}
 
 	@Override
