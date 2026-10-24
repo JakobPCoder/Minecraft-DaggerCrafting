@@ -16,7 +16,7 @@
     "per_level_above_first": 15
   },
   "anvil_cost": 2,
-  "slots": ["hand"],
+  "slots": ["mainhand"],
   "effects": {
     "minecraft:projectile_spawned": [
       {
