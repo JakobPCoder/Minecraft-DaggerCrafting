@@ -99,7 +99,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 		if (item instanceof DaggerItem daggerItem) {
 			return daggerItem.getMaterial();
 		} else {
-			System.out.println("getMaterialFromItem failed");
+			DaggerCrafting.LOGGER.warn("getMaterialFromItem called with non-dagger item {}, using diamond_dagger", item);
 			return DaggerToolMaterial.DAGGER_TOOL_MATERIALS.get("diamond_dagger");
 		}
 	}
@@ -177,7 +177,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 			int throwingSpeedLevel = throwingSpeedEnchantment != null
 				? EnchantmentHelper.getItemEnchantmentLevel(throwingSpeedEnchantment, stack)
 				: 0;
-			System.out.println("throwingSpeedLevel: " + throwingSpeedLevel);
 
 			if (throwingSpeedLevel > 0) {
 				float multiplier = 1.5f;
@@ -198,7 +197,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 				speed,
 				0.0F
 			);
-			System.out.println("DaggerItem releaseUsing daggerEntity: " + daggerEntity.getPickupItemStackOrigin());
 			player.setXRot(player.getXRot() + pitchOffset);
 
 			if (player.hasInfiniteMaterials()) {

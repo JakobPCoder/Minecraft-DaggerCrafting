@@ -1,7 +1,11 @@
 # Changelog
 
+## [1.2.1]
 
-
+### Changed
+- Built for Minecraft 26.2 (Fabric, official names).
+- Replaced the placeholder Fabric mod description with a real one.
+- Removed leftover debug console output from throws, entity setup, and enchant checks.
 
 ## [1.1.1]
 
