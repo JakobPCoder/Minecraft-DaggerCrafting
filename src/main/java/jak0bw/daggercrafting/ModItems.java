@@ -22,7 +22,7 @@ import net.minecraft.world.item.Item;
 /**
  * Registers dagger items and attaches them to creative tabs.
  *
- * <p>Items enter the game registry from this class's static initializer (one {@link DaggerItem}
+ * Items enter the game registry from this class's static initializer (one {@link DaggerItem}
  * per {@link DaggerToolMaterial} key). Fabric's creative tab API must be subscribed during mod
  * init, not at class load, so tab mutations are queued and executed in
  * {@link #registerModItems()} when {@link DaggerCrafting#onInitialize()} runs.
@@ -96,7 +96,7 @@ public class ModItems {
 	/**
 	 * Subscribes queued creative-tab listeners so daggers appear under Combat.
 	 *
-	 * <p>Must run on the mod initializer thread during {@link DaggerCrafting#onInitialize()};
+	 * Must run on the mod initializer thread during {@link DaggerCrafting#onInitialize()};
 	 * calling earlier would run before Fabric's tab event bus is ready.
 	 */
 	public static void registerModItems() {

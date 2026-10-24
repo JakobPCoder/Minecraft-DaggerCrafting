@@ -8,7 +8,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 /**
  * Stable {@link ResourceKey} handles for dagger enchantments defined in datapacks.
  *
- * <p>Enchantment behavior and levels live under {@code data/daggercrafting/enchantment/*.json}.
+ * Enchantment behavior and levels live under {@code data/daggercrafting/enchantment/*.json}.
  * Java code references {@link #THROWING_SPEED} (and future keys) for checks in
  * {@link jak0bw.daggercrafting.item.DaggerItem} or entity logic without hard-coding raw ids.
  */
@@ -33,7 +33,7 @@ public class ModEnchantments {
 	/**
 	 * Startup hook reserved for future runtime enchantment setup.
 	 *
-	 * <p>Today, registration is entirely JSON-driven; this method only logs so initialization
+	 * Today, registration is entirely JSON-driven; this method only logs so initialization
 	 * order in {@link DaggerCrafting#onInitialize()} stays symmetric with other {@code Mod*} classes.
 	 */
 	public static void registerModEnchantments() {

@@ -1,5 +1,10 @@
 package jak0bw.daggercrafting;
 
+import jak0bw.daggercrafting.particle.BurningTrailContributor;
+import jak0bw.daggercrafting.particle.DefaultBlockImpactContributor;
+import jak0bw.daggercrafting.particle.DefaultTrailContributor;
+import jak0bw.daggercrafting.particle.ParticleContributors;
+
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -8,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Common (dedicated-server and client) entry point for the Dagger Crafting Fabric mod.
  *
- * <p>Fabric invokes {@link #onInitialize()} once at mod load. This class does not register
+ * Fabric invokes {@link #onInitialize()} once at mod load. This class does not register
  * content itself; it delegates to the {@code Mod*} registries so initialization order stays
  * explicit and grep-friendly.
  */
@@ -26,10 +31,11 @@ public class DaggerCrafting implements ModInitializer {
 	/**
 	 * Wires mod content after Fabric has constructed the mod container.
 	 *
-	 * <p>Enchantment keys are initialized first (datapack-backed), then throwable entity types
+	 * Enchantment keys are initialized first (datapack-backed), then throwable entity types
 	 * (one per {@link DaggerToolMaterial} tier), then creative-tab hooks for items. Item
 	 * instances are created earlier in {@link ModItems}'s static initializer when that class
 	 * is first referenced; {@link ModItems#registerModItems()} only flushes deferred tab events.
+	 * Particle trail contributors register last so they can read fully constructed entities at runtime.
 	 */
 	@Override
 	public void onInitialize() {
@@ -38,5 +44,8 @@ public class DaggerCrafting implements ModInitializer {
 		ModEnchantments.registerModEnchantments();
 		ModEntities.registerModEntities();
 		ModItems.registerModItems();
+		ParticleContributors.register(new DefaultTrailContributor());
+		ParticleContributors.register(new BurningTrailContributor());
+		ParticleContributors.register(new DefaultBlockImpactContributor());
 	}
 }
