@@ -4,7 +4,24 @@ This repo supports **Minecraft 26.x only**. Older `1.21.x` branches are **legacy
 
 You do not need to be a Git expert. Copy the PowerShell commands as written. Use `;` between commands (not `&&`).
 
-## Layers
+## Branch names in use now (`<mc>-<mod>`)
+
+**New work** uses Minecraft version + mod version in the branch name (see also `.cursor/rules/branch-naming.mdc`).
+
+| Purpose | Pattern | Example |
+| --- | --- | --- |
+| Integration line for one release | `<mc>-<mod>` | `26.2-1.3.0` (current), `26.2-1.4.0` (next line) |
+| Feature | `<mc>-<mod>-<feature>` | `26.2-1.4.0-custom-arrows` |
+
+1. Create the **line branch** when you bump `mod_version` (ideally empty aside from version/metadata).
+2. Branch features off that line; merge features **into** the line branch.
+3. Release from the line branch; tags stay `v<mod>-<mc>` (e.g. `v1.3.0-26.2`).
+
+Per-Minecraft lines are separate (e.g. `26.3-1.2.1`). Do not add features on legacy `1.21.x-*` branches.
+
+The `base/*` and `feature/*` layout below is **historical**; prefer `<mc>-<mod>` for new branches unless you are maintaining an old clone workflow.
+
+## Layers (historical `base/*` / `feature/*`)
 
 ```
 base/26.2 --> base/26.3 --> base/26.7 (later)

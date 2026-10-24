@@ -36,19 +36,25 @@ Daggers support the following vanilla enchantments:
 
 ### Vanilla
 
-*   **Loyalty**
+*   **Loyalty** (Levels I-III)
     *   Unlike vanilla tridents, a dagger's Loyalty enchantment scales directly with its material's base throwing velocity! High-tier daggers, like Diamond, return significantly faster, enabling quicker follow-up throws and a fluid ranged combat experience. Essential for viability as a ranged weapon.
-*   **Fire Aspect**
-    *   Works just like in vanilla. Sets the target on fire for 5 seconds on melee attacks.
-*   **Flame**
-    *   Works just like in vanilla. Sets the dagger and target on fire for 5 seconds on ranged attacks.
+*   **Fire Aspect** (Levels I-II)
+    *   Works just like in vanilla. Sets the target on fire on melee attacks: **I** for 4 seconds, **II** for 8 seconds.
+*   **Flame** (Level I)
+    *   Sets the thrown dagger on fire for 5 seconds. On a hit, the target is set on fire for 4 seconds, which is shorter than vanilla arrows (5 seconds). Ranged attacks only.
+*   **Unbreaking** (Levels I-III)
+    *   Works just like in vanilla. Each point of durability lost has a chance to be ignored: **I** 50%, **II** 67%, **III** 75%. A dagger lasts **2x**, **3x** or **4x** as long. See the durability table below.
 
 _These enchantments work just like in vanilla. Their modifiers are applied on **melee and ranged attacks**._ All listed vanilla enchantments, except Mending, can be obtained through an enchanting table. Mending can be applied via an anvil.
 
-*   **Sharpness**
-*   **Smite**
-*   **Bane of Arthropods**
-*   **Mending**: Compatible with daggers, obtained via an anvil.
+*   **Sharpness** (Levels I-V)
+    *   Works just like in vanilla. Increases the damage dealt on melee and ranged hits.
+*   **Smite** (Levels I-V)
+    *   Works just like in vanilla. Increases the damage dealt to undead mobs on melee and ranged hits.
+*   **Bane of Arthropods** (Levels I-V)
+    *   Works just like in vanilla. Increases the damage dealt to arthropod mobs (like spiders and silverfish) on melee and ranged hits, and slows them down.
+*   **Mending** (Level I)
+    *   Works just like in vanilla. Repairs the dagger using experience. Obtained via an anvil.
 
 ### Custom enchantments
 
@@ -69,4 +75,16 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 | Iron |7 |1.8 |100 |4 |11 |
 | Diamond |8 |**2.0** |250 |5 |10 |
 | Netherite |9 |**2.0** |500 |6 |15 |
+
+### Durability with Unbreaking
+
+| **Material** | **Base** | **Unbreaking I** | **Unbreaking II** | **Unbreaking III** |
+| -------- |------------- |--------------- |---------- |------------- |
+| Golden |20 |40 |60 |80 |
+| Wooden |30 |60 |90 |120 |
+| Stone |50 |100 |150 |200 |
+| Copper |70 |140 |210 |280 |
+| Iron |100 |200 |300 |400 |
+| Diamond |250 |500 |750 |1000 |
+| Netherite |500 |1000 |1500 |2000 |
 ---
