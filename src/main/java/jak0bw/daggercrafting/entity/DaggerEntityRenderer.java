@@ -57,14 +57,14 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 				(float) Math.toRadians(-daggerState.pitch),
 				0.0f
 			);
-			poseStack.mulPose(quaternion);
+			poseStack.rotate(quaternion);
 
 			org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
 				(float) Math.toRadians(this.getAnimatedAngle(daggerState.seconds, 70, 135, 0.3f)),
 				(float) Math.toRadians(90),
 				0.0f
 			);
-			poseStack.mulPose(quaternion2);
+			poseStack.rotate(quaternion2);
 		}
 		flyingItemEntityRenderState.item.submit(
 			poseStack,
@@ -74,7 +74,7 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 			flyingItemEntityRenderState.outlineColor
 		);
 		poseStack.popPose();
-		// ThrownItemRenderer.submit also draws the stack after mulPose(camera.orientation),
+		// ThrownItemRenderer.submit also draws the stack after rotate(camera.orientation),
 		// which is the camera-facing copy. 1.21.5 never called super.render().
 	}
 

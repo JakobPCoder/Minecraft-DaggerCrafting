@@ -65,7 +65,8 @@ Loader **0.19.5** is still cited for 26.3 on the Fabric blog; bump only if devel
 
 | 26.2 | 26.3 | Notes |
 | --- | --- | --- |
-| `this.hurtMarked = true` | `this.syncVelocity()` (or equivalent on `Entity`) | NeoForged primer: `hurtMarked` → `syncVelocity`. Used when delta movement is large so clients get velocity sync. Compare **`ThrownTrident#tick`** on 26.3 after genSources. |
+| `this.hurtMarked = true` | `this.syncVelocity = true` | On 26.3 `Entity.syncVelocity` is a **boolean field**, not a method. Same “tell the client the velocity packet” meaning as `hurtMarked`. |
+| `deflect(REVERSE, entity, owner, false)` then `setDeltaMovement(...multiply(0.02, 0.2, 0.02))` | `deflect(REVERSE, entity, owner, false, new Vec3(0.02, 0.2, 0.02))` | `Projectile.deflect` gained a scale `Vec3` (or uniform `double`). **`ThrownTrident#onHitEntity`** passes the old bounce multipliers in and does not multiply afterwards. |
 
 No other entity fields from the 26.3 migration lists appear in our entity code (`invulnerableTime`, swing APIs, etc. are unused).
 
@@ -152,10 +153,10 @@ Open beside our code while fixing:
 
 ## 8. Honest gaps
 
-Not line-verified against a 26.3 jar in this workspace (primer + Fabric post + community port notes only):
+Checked against the 26.3 merged jar (`javap` / `compileJava`) in this port:
 
-- Exact signature of `Entity#syncVelocity` vs old `hurtMarked` assignment semantics.
-- Whether `ThrownItemRenderer#submit` or `extractRenderState` renamed again.
-- Whether `EnchantmentMixin` descriptor strings need updating.
+- `ThrownItemRenderer#submit` / `extractRenderState` were unchanged in this port (`compileJava` 26.3).
+- `EnchantmentMixin` `canEnchant` / `isPrimaryItem` still matched; no descriptor change.
+- `PoseStack#mulPose` → `rotate` compiled as documented.
 
 Treat those as “open vanilla on 26.3 genSources” items — typically minutes, not a second full port.
