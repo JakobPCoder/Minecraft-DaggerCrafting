@@ -42,3 +42,8 @@ replay_*.log
 # python
 
 *.py
+
+# cursor local scratch (decompiled Minecraft sources, browser dumps)
+
+.cursor/mc-*-src/
+cf_page.html

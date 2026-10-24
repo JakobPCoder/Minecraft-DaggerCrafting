@@ -11,69 +11,41 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 /**
- * Per-material combat numbers for daggers (melee, throw, durability, repair).
+ * Stat bundle for one dagger material tier: melee, thrown projectile, mining, durability, and enchantability.
  *
- * <p>This is a mod-owned record of stats, not vanilla {@code ToolMaterial}.
+ * <p>Vanilla tools use {@code ToolMaterial}; daggers need extra thrown-attack fields and share one
+ * {@link jak0bw.daggercrafting.item.DaggerItem} implementation, so tiers are defined here and
+ * referenced from {@link ModItems} and {@link ModEntities}.
  *
- * @param inverseTag The tag for blocks that are incorrect for this material.
- * @param repairIngredientTag The tag for items that can repair this material.
- * @param rangedDamage The damage of the dagger when thrown.
- * @param rangedVelocity The velocity of the dagger when thrown.
- * @param attackDamage The damage of the dagger when used in melee combat.
- * @param miningSpeed The mining speed of the dagger.
- * @param durability The durability of the dagger.
- * @param enchantability The enchantability of the dagger.
+ * <p>{@link #DAGGER_TOOL_MATERIALS} is filled in a static initializer (insertion order = tier order).
+ * Keys such as {@code iron_dagger} double as item ids and throwable entity ids.
  */
 public class DaggerToolMaterial {
-	/**
-	 * The tag for blocks that are incorrect for this material.
-	 */
+
 	private final TagKey<Block> inverseTag;
-	/**
-	 * The tag for items that can repair this material.
-	 */
 	private final TagKey<Item> repairIngredientTag;
-	/**
-	 * The damage of the dagger when thrown.
-	 */
 	private final float rangedDamage;
-	/**
-	 * The velocity of the dagger when thrown.
-	 */
 	private final float rangedVelocity;
-	/**
-	 * The damage of the dagger when used in melee combat. A base damage of 1.0 is added on top of this.
-	 */
 	private final float attackDamage;
-	/**
-	 * The mining speed of the dagger. 4.0 is the base value, whatever we put here is added/subtracted from this.
-	 */
 	private final float miningSpeed;
-	/**
-	 * The durability of the dagger.
-	 */
 	private final int durability;
-	/**
-	 * The enchantability of the dagger.
-	 */
 	private final int enchantability;
 
 	/**
-	 * A map of all registered dagger materials, insertion-ordered by tier.
+	 * All material tiers, keyed by registry name (e.g. {@code wooden_dagger}).
+	 * Populated before any {@link ModItems} or {@link ModEntities} static logic runs.
 	 */
 	public static Map<String, DaggerToolMaterial> DAGGER_TOOL_MATERIALS = new LinkedHashMap<>();
 
 	/**
-	 * Constructor for the DaggerToolMaterial class.
-	 *
-	 * @param inverseTag The tag for blocks that are incorrect for this material.
-	 * @param repairIngredientTag The tag for items that can repair this material.
-	 * @param rangedDamage The damage of the dagger when thrown.
-	 * @param rangedVelocity The velocity of the dagger when thrown.
-	 * @param attackDamage The damage of the dagger when used in melee combat.
-	 * @param miningSpeed The mining speed of the dagger.
-	 * @param durability The durability of the dagger.
-	 * @param enchantability The enchantability of the dagger.
+	 * @param inverseTag blocks in this tag are mined slowly (vanilla incorrect-for-tool semantics)
+	 * @param repairIngredientTag items that repair this tier in an anvil (usually {@code repairs_<name>})
+	 * @param rangedDamage bonus damage applied when the dagger hits as a projectile
+	 * @param rangedVelocity initial speed multiplier for thrown daggers
+	 * @param attackDamage stored melee component; {@link jak0bw.daggercrafting.item.DaggerItem} adds vanilla base weapon damage on top
+	 * @param miningSpeed offset from the dagger item's internal base dig speed
+	 * @param durability max damage before break
+	 * @param enchantability weight for enchantment table rolls (higher = better odds)
 	 */
 	public DaggerToolMaterial(
 		TagKey<Block> inverseTag,
@@ -95,27 +67,61 @@ public class DaggerToolMaterial {
 		this.enchantability = enchantability;
 	}
 
-	public TagKey<Block> getInverseTag() { return this.inverseTag; }
-	public TagKey<Item> getRepairIngredientTag() { return this.repairIngredientTag; }
-	public float getRangedDamage() { return this.rangedDamage; }
-	public float getRangedVelocity() { return this.rangedVelocity; }
-	public float getAttackDamage() { return this.attackDamage; }
-	public float getMiningSpeed() { return this.miningSpeed; }
-	public int getDurability() { return this.durability; }
-	public int getEnchantability() { return this.enchantability; }
+	/** @return block tag used to penalize mining the wrong blocks for this tier */
+	public TagKey<Block> getInverseTag() {
+		return this.inverseTag;
+	}
+
+	/** @return item tag for anvil repair ingredients tied to this material */
+	public TagKey<Item> getRepairIngredientTag() {
+		return this.repairIngredientTag;
+	}
+
+	/** @return thrown-hit damage contribution before enchantments and crit rules */
+	public float getRangedDamage() {
+		return this.rangedDamage;
+	}
+
+	/** @return thrown launch speed factor consumed by {@link jak0bw.daggercrafting.entity.DaggerEntity} */
+	public float getRangedVelocity() {
+		return this.rangedVelocity;
+	}
+
+	/** @return melee damage component stored after {@link #registerDaggerMaterial} normalization */
+	public float getAttackDamage() {
+		return this.attackDamage;
+	}
+
+	/** @return dig-speed delta paired with the dagger item's fixed tool baseline */
+	public float getMiningSpeed() {
+		return this.miningSpeed;
+	}
+
+	/** @return maximum item damage capacity */
+	public int getDurability() {
+		return this.durability;
+	}
+
+	/** @return enchantability tier for table and loot rolls */
+	public int getEnchantability() {
+		return this.enchantability;
+	}
 
 	/**
-	 * Registers a new dagger material and a matching {@code repairs_<name>} item tag key.
+	 * Defines a new tier, registers a matching {@code daggercrafting:repairs_<name>} item tag, and caches the instance.
 	 *
-	 * @param name The name of the dagger material.
-	 * @param inverseTag The tag for blocks that are incorrect for this material.
-	 * @param rangedDamage The damage of the dagger when thrown.
-	 * @param rangedVelocity The velocity of the dagger when thrown.
-	 * @param attackDamage The damage of the dagger when used in melee combat.
-	 * @param miningSpeed The mining speed of the dagger.
-	 * @param durability The durability of the dagger.
-	 * @param enchantability The enchantability of the dagger.
-	 * @return The registered dagger material.
+	 * <p>The {@code attackDamage} argument is the designer-facing total before storage adjustment:
+	 * one point is subtracted here so item code can add vanilla's +1 weapon baseline without double-counting.
+	 *
+	 * @param name registry stem shared by item and entity ({@code <name>})
+	 * @param inverseTag vanilla incorrect-for-tool block tag for this tier
+	 * @param rangedDamage thrown damage bonus
+	 * @param rangedVelocity thrown speed multiplier
+	 * @param attackDamage intended total melee damage before internal −1 normalization
+	 * @param miningSpeed mining speed offset
+	 * @param durability item durability
+	 * @param enchantability enchantment roll weight
+	 * @return the registered material (also inserted into {@link #DAGGER_TOOL_MATERIALS})
 	 */
 	public static DaggerToolMaterial registerDaggerMaterial(
 		String name,
@@ -141,6 +147,7 @@ public class DaggerToolMaterial {
 		return material;
 	}
 
+	// Tier definitions mirror vanilla tool progression (wood → netherite) for familiar balance.
 	static {
 		registerDaggerMaterial(
 			"wooden_dagger",
