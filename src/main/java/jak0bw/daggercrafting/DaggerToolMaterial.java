@@ -13,11 +13,11 @@ import net.minecraft.world.level.block.Block;
 /**
  * Stat bundle for one dagger material tier: melee, thrown projectile, mining, durability, and enchantability.
  *
- * <p>Vanilla tools use {@code ToolMaterial}; daggers need extra thrown-attack fields and share one
+ * Vanilla tools use {@code ToolMaterial}; daggers need extra thrown-attack fields and share one
  * {@link jak0bw.daggercrafting.item.DaggerItem} implementation, so tiers are defined here and
  * referenced from {@link ModItems} and {@link ModEntities}.
  *
- * <p>{@link #DAGGER_TOOL_MATERIALS} is filled in a static initializer (insertion order = tier order).
+ * {@link #DAGGER_TOOL_MATERIALS} is filled in a static initializer (insertion order = tier order).
  * Keys such as {@code iron_dagger} double as item ids and throwable entity ids.
  */
 public class DaggerToolMaterial {
@@ -110,7 +110,7 @@ public class DaggerToolMaterial {
 	/**
 	 * Defines a new tier, registers a matching {@code daggercrafting:repairs_<name>} item tag, and caches the instance.
 	 *
-	 * <p>The {@code attackDamage} argument is the designer-facing total before storage adjustment:
+	 * The {@code attackDamage} argument is the designer-facing total before storage adjustment:
 	 * one point is subtracted here so item code can add vanilla's +1 weapon baseline without double-counting.
 	 *
 	 * @param name registry stem shared by item and entity ({@code <name>})

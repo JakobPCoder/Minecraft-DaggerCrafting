@@ -15,7 +15,7 @@ import net.minecraft.world.entity.MobCategory;
 /**
  * Registers one {@link DaggerEntity} type per material tier.
  *
- * <p>Entity ids align with item ids ({@code wooden_dagger}, etc.) so thrown stacks can resolve
+ * Entity ids align with item ids ({@code wooden_dagger}, etc.) so thrown stacks can resolve
  * the correct projectile behavior via {@link ModItems#DAGGER_ITEMS} and
  * {@link DaggerToolMaterial}. Client rendering is bound in {@link DaggerCraftingClient}.
  */
@@ -51,7 +51,7 @@ public class ModEntities {
 	/**
 	 * Registers every tier listed in {@link DaggerToolMaterial#DAGGER_TOOL_MATERIALS}.
 	 *
-	 * <p>Invoked from {@link DaggerCrafting#onInitialize()} after enchantment keys are set up
+	 * Invoked from {@link DaggerCrafting#onInitialize()} after enchantment keys are set up
 	 * and before creative-tab hooks run.
 	 */
 	public static void registerModEntities() {

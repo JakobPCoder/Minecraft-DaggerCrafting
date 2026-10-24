@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0]
+
+### Added
+- Client particle trails on thrown daggers (crit sparks; on-fire throws use flame and smoke).
+- Speed-scaled terrain crumb bursts when a thrown dagger hits a block.
+
 ## [1.2.1]
 
 ### Changed
