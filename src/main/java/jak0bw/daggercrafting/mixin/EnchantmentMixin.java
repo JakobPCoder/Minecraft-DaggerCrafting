@@ -21,17 +21,14 @@ public class EnchantmentMixin {
 		Enchantment self,
 		ItemStack stack,
 		CallbackInfoReturnable<Boolean> cir,
-		String[] validEnchantments,
-		String logContext
+		String[] validEnchantments
 	) {
 		if (!(stack.getItem() instanceof DaggerItem)) {
 			return;
 		}
 		String enchantmentPath = enchantmentPath(self);
-		System.out.println("Checking enchantment: " + enchantmentPath + " for dagger (" + logContext + ")");
 		for (String valid : validEnchantments) {
 			if (enchantmentPath.contains(valid)) {
-				System.out.println("ALLOWING " + valid.toUpperCase() + " ON DAGGER! (" + logContext + ")");
 				cir.setReturnValue(true);
 				break;
 			}
@@ -66,8 +63,7 @@ public class EnchantmentMixin {
 				"smite",
 				"bane_of_arthropods",
 				"mending"
-			},
-			"anvil"
+			}
 		);
 	}
 
@@ -86,8 +82,7 @@ public class EnchantmentMixin {
 				"sharpness",
 				"smite",
 				"bane_of_arthropods"
-			},
-			"enchanting_table"
+			}
 		);
 	}
 }

@@ -3,7 +3,7 @@
 	"id": "daggercrafting",
 	"version": "${version}",
 	"name": "DaggerCrafting",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Throwable daggers that mix fast melee and ranged combat, with material stats and trident-like throwing.",
 	"authors": [
 		"Jak0bW"
 	],
