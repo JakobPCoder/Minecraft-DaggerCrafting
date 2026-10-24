@@ -1,0 +1,36 @@
+---
+description: Git branch naming — Minecraft version, mod version, and feature suffixes.
+alwaysApply: true
+---
+
+# Branch naming (daggercrafting)
+
+Use **Minecraft version first**, then **mod version** from `gradle.properties` (`mod_version`), then an optional **feature slug**.
+
+## Patterns
+
+| Kind | Name | Example |
+| --- | --- | --- |
+| **Line branch** (integration for one MC + mod release) | `<mc>-<mod>` | `26.2-1.4.0` |
+| **Feature work** | `<mc>-<mod>-<feature>` | `26.2-1.4.0-thrown-dagger-tweak` |
+
+- `<mc>`: Minecraft target (e.g. `26.2`, `26.3`). Must match `minecraft_version` on that branch.
+- `<mod>`: Full semver (e.g. `1.3.0`, `1.4.0`), not a literal `x` — `1.4.x` in planning means “the 1.4 release line”.
+- `<feature>`: short **kebab-case** description (no spaces).
+
+## Workflow
+
+1. When starting a **new mod version** on a given MC: create the **line branch** from the previous line (or current release), with **only** version bumps / changelog prep if needed — no feature commits yet.
+2. Each **new feature**: branch from that line → `26.2-1.4.0-my-feature` → merge back into `26.2-1.4.0` when done.
+3. **Ship**: tag jars like `v1.4.0-26.2`; merge the line branch to `main` when releasing (project convention).
+
+## Do not use for new work
+
+- Legacy frozen lines: `1.21.x-*` and old `base/*` / `feature/*` names (see `docs/BRANCHING_WORKFLOW.md` historical section).
+- Do not put new gameplay on port-only branches without the `<mc>-<mod>` naming.
+
+## Agents
+
+Before creating branches, run `git branch -a` and match an existing line (e.g. `26.2-1.3.0` today). If the target line branch does not exist yet, ask to create it before opening feature branches.
+
+More detail: `docs/BRANCHING_WORKFLOW.md` (naming section).
