@@ -1,102 +1,112 @@
 package jak0bw.daggercrafting.entity;
 
-import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.state.FlyingItemEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.FlyingItemEntity;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import jak0bw.daggercrafting.ModItems;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.renderer.entity.state.ThrownItemRenderState;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
+/**
+ * Submits a thrown dagger as a GROUND item model, rotated by yaw/pitch and a short spin.
+ */
 @Environment(EnvType.CLIENT)
-public class DaggerEntityRenderer extends FlyingItemEntityRenderer<DaggerEntity> {
-    private final ItemModelManager itemModelManager;
+public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
+	private final ItemModelResolver itemModelResolver;
 
-    public DaggerEntityRenderer(EntityRendererFactory.Context context) {
-        super(context);
-        this.itemModelManager = context.getItemModelManager();
-    }
+	public DaggerEntityRenderer(EntityRendererProvider.Context context) {
+		super(context);
+		this.itemModelResolver = context.getItemModelResolver();
+	}
 
-    /**
-     * Animates from startAngle to endAngle over duration seconds using ease-in/ease-out.
-     * After duration, stays at endAngle.
-     */
-    private float getAnimatedAngle(float seconds, float startAngle, float endAngle, float duration) {
-        if (seconds <= 0) return startAngle;
-        if (seconds >= duration) return endAngle;
-        float t = seconds / duration;
-        // Quadratic ease-out
-        float easeOutT = 1f - (1f - t) * (1f - t);
-        return startAngle + (endAngle - startAngle) * easeOutT;
-    }
+	/**
+	 * Animates from startAngle to endAngle over duration seconds using ease-out.
+	 * After duration, stays at endAngle.
+	 */
+	private float getAnimatedAngle(float seconds, float startAngle, float endAngle, float duration) {
+		if (seconds <= 0) {
+			return startAngle;
+		}
+		if (seconds >= duration) {
+			return endAngle;
+		}
+		float t = seconds / duration;
+		float easeOutT = 1f - (1f - t) * (1f - t);
+		return startAngle + (endAngle - startAngle) * easeOutT;
+	}
 
-    @Override
-    public void render(FlyingItemEntityRenderState flyingItemEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        matrixStack.push();
-        matrixStack.scale(1.0F, 1.0F, 1.0F);
-        if (flyingItemEntityRenderState instanceof DaggerEntityRenderState daggerState) {
-            // Construct quaternion from yaw, pitch, roll=0
-            org.joml.Quaternionf quaternion = new org.joml.Quaternionf().rotationYXZ(
-                (float)Math.toRadians(daggerState.yaw),
-                (float)Math.toRadians(-daggerState.pitch),
-                0.0f // Roll (Z axis)
-            );
-            matrixStack.multiply(quaternion);
+	@Override
+	public void submit(
+		ThrownItemRenderState flyingItemEntityRenderState,
+		PoseStack poseStack,
+		SubmitNodeCollector submitNodeCollector,
+		CameraRenderState camera
+	) {
+		poseStack.pushPose();
+		poseStack.scale(1.0F, 1.0F, 1.0F);
+		if (flyingItemEntityRenderState instanceof DaggerEntityRenderState daggerState) {
+			org.joml.Quaternionf quaternion = new org.joml.Quaternionf().rotationYXZ(
+				(float) Math.toRadians(daggerState.yaw),
+				(float) Math.toRadians(-daggerState.pitch),
+				0.0f
+			);
+			poseStack.mulPose(quaternion);
 
-            // Example: animate from 135deg to 405deg (135+270) over 1.5 seconds
-            org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
-                (float)Math.toRadians(this.getAnimatedAngle(daggerState.seconds,70, 135, 0.3f)),
-                (float)Math.toRadians(90),
-                0.0f
-            );
-            matrixStack.multiply(quaternion2);
+			org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
+				(float) Math.toRadians(this.getAnimatedAngle(daggerState.seconds, 70, 135, 0.3f)),
+				(float) Math.toRadians(90),
+				0.0f
+			);
+			poseStack.mulPose(quaternion2);
+		}
+		flyingItemEntityRenderState.item.submit(
+			poseStack,
+			submitNodeCollector,
+			flyingItemEntityRenderState.lightCoords,
+			OverlayTexture.NO_OVERLAY,
+			flyingItemEntityRenderState.outlineColor
+		);
+		poseStack.popPose();
+		// ThrownItemRenderer.submit also draws the stack after mulPose(camera.orientation),
+		// which is the camera-facing copy. 1.21.5 never called super.render().
+	}
 
-        } 
-        flyingItemEntityRenderState.itemRenderState.render(matrixStack, vertexConsumerProvider, i, OverlayTexture.DEFAULT_UV);
-        matrixStack.pop();
-    }
+	@Override
+	public void extractRenderState(DaggerEntity entity, ThrownItemRenderState flyingItemEntityRenderState, float f) {
+		super.extractRenderState(entity, flyingItemEntityRenderState, f);
 
-     
-    @Override
-    public void updateRenderState(DaggerEntity entity, FlyingItemEntityRenderState flyingItemEntityRenderState, float f) {
-        super.updateRenderState(entity, flyingItemEntityRenderState, f);
+		if (!(flyingItemEntityRenderState instanceof DaggerEntityRenderState)) {
+			throw new IllegalStateException("DaggerEntityRenderer: ThrownItemRenderState is not a DaggerEntityRenderState");
+		}
 
-        if (!(flyingItemEntityRenderState instanceof DaggerEntityRenderState)) {
-            throw new IllegalStateException("DaggerEntityRenderer: FlyingItemEntityRenderState is not a DaggerEntityRenderState");
-        }
+		DaggerEntityRenderState daggerEntityRenderState = (DaggerEntityRenderState) flyingItemEntityRenderState;
+		daggerEntityRenderState.yaw = entity.getYRot();
+		daggerEntityRenderState.pitch = entity.getXRot();
+		daggerEntityRenderState.seconds = entity.seconds;
 
-        DaggerEntityRenderState daggerEntityRenderState = (DaggerEntityRenderState) flyingItemEntityRenderState;
-        daggerEntityRenderState.yaw = entity.getYaw();
-        daggerEntityRenderState.pitch = entity.getPitch();
-        daggerEntityRenderState.seconds = entity.seconds;
+		ItemStack stack = entity.getPickupItemStackOrigin();
 
-        ItemStack stack = entity.getItemStack();
+		if (stack == null || stack.isEmpty()) {
+			throw new IllegalStateException("DaggerEntityRenderer: Stack is null or empty");
+		}
 
-        if (stack == null || stack.isEmpty()) 
-            throw new IllegalStateException("DaggerEntityRenderer: Stack is null or empty");
-      
+		this.itemModelResolver.updateForNonLiving(
+			flyingItemEntityRenderState.item,
+			stack,
+			ItemDisplayContext.GROUND,
+			entity
+		);
+	}
 
-
-            
-        this.itemModelManager.updateForNonLivingEntity(
-            flyingItemEntityRenderState.itemRenderState, 
-            stack, 
-            ItemDisplayContext.GROUND,
-            entity
-        );
-    }
-
-    @Override
-    public FlyingItemEntityRenderState createRenderState() {
-        return new DaggerEntityRenderState();
-     }
-} 
+	@Override
+	public ThrownItemRenderState createRenderState() {
+		return new DaggerEntityRenderState();
+	}
+}
