@@ -168,7 +168,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		if (!this.level().isClientSide()) {
 			double velocitySquared = this.getDeltaMovement().lengthSqr();
 			if (velocitySquared > 2.0) {
-				this.hurtMarked = true;
+				// 26.3: hurtMarked became a public flag that schedules a velocity packet.
+				this.syncVelocity = true;
 			}
 		}
 	}
@@ -235,8 +236,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			living.igniteForSeconds(4);
 		}
 
-		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false);
-		this.setDeltaMovement(this.getDeltaMovement().multiply(0.02, 0.2, 0.02));
+		// ThrownTrident now passes the bounce scale into deflect instead of multiplying after.
+		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
 		this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
 	}
 
