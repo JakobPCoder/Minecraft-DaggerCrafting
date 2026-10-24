@@ -4,6 +4,8 @@
 
 [GITHUB](https://github.com/JakobPCoder/Minecraft-DaggerCrafting)
 
+Supported Minecraft versions are **26.x**. Git layout (`base/26.2`, `base/26.3`, features vs ports) is in [docs/BRANCHING_WORKFLOW.md](docs/BRANCHING_WORKFLOW.md). Port notes: [docs/PORTING_1.21.5_TO_26.2.md](docs/PORTING_1.21.5_TO_26.2.md), [docs/PORTING_26.2_TO_26.3.md](docs/PORTING_26.2_TO_26.3.md). Legacy `1.21.x` branches are frozen.
+
 This is an early version, feedback and ideas are welcome!
 
 DaggerCrafting is a Minecraft mod that introduces throwable daggers as a new weapon type, blending fast-paced melee and ranged combat. Each dagger's stats and behavior are determined by its material, offering new strategic options. Also its a lot of fun!
