@@ -13,25 +13,30 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 
 /**
- * Handles registration of custom dagger entities for the DaggerCrafting mod.
- * Uses a static list of dagger type names and a static map for entity types, registered via a helper method.
+ * Registers one {@link DaggerEntity} type per material tier.
+ *
+ * <p>Entity ids align with item ids ({@code wooden_dagger}, etc.) so thrown stacks can resolve
+ * the correct projectile behavior via {@link ModItems#DAGGER_ITEMS} and
+ * {@link DaggerToolMaterial}. Client rendering is bound in {@link DaggerCraftingClient}.
  */
 public class ModEntities {
+
 	/**
-	 * Map of dagger entity type name to registered EntityType.
-	 * Populated during mod initialization.
+	 * Material name → registered entity type, filled in {@link #registerModEntities()}.
+	 * Order matches {@link DaggerToolMaterial#DAGGER_TOOL_MATERIALS}.
 	 */
 	public static final LinkedHashMap<String, EntityType<DaggerEntity>> DAGGER_ENTITY_TYPES = new LinkedHashMap<>();
 
 	/**
-	 * Helper to register a DaggerEntity type for a given name.
+	 * Creates and registers a small misc projectile with conservative sync settings.
 	 *
-	 * @param name The dagger entity type name (e.g., "iron_dagger").
-	 * @return The registered EntityType.
+	 * @param name shared registry stem with the matching dagger item
+	 * @return the type registered in {@link BuiltInRegistries#ENTITY_TYPE}
 	 */
 	private static EntityType<DaggerEntity> registerDaggerEntityType(String name) {
 		Identifier id = Identifier.fromNamespaceAndPath(DaggerCrafting.MOD_ID, name);
 		ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, id);
+		// MISC + half-block hitbox matches vanilla thrown items; low tracking range is enough for short flights.
 		return Registry.register(
 			BuiltInRegistries.ENTITY_TYPE,
 			key,
@@ -44,8 +49,10 @@ public class ModEntities {
 	}
 
 	/**
-	 * Registers all dagger entity types and populates the DAGGER_ENTITY_TYPES map.
-	 * Should be called during mod initialization.
+	 * Registers every tier listed in {@link DaggerToolMaterial#DAGGER_TOOL_MATERIALS}.
+	 *
+	 * <p>Invoked from {@link DaggerCrafting#onInitialize()} after enchantment keys are set up
+	 * and before creative-tab hooks run.
 	 */
 	public static void registerModEntities() {
 		DaggerCrafting.LOGGER.info("Registering Mod Entities for " + DaggerCrafting.MOD_ID);

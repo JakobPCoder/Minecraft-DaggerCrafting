@@ -20,24 +20,30 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 
 /**
- * Handles registration and creative tab assignment for all DaggerCrafting items.
+ * Registers dagger items and attaches them to creative tabs.
+ *
+ * <p>Items enter the game registry from this class's static initializer (one {@link DaggerItem}
+ * per {@link DaggerToolMaterial} key). Fabric's creative tab API must be subscribed during mod
+ * init, not at class load, so tab mutations are queued and executed in
+ * {@link #registerModItems()} when {@link DaggerCrafting#onInitialize()} runs.
  */
 public class ModItems {
+
 	/**
-	 * Creative-tab mutations are deferred until {@link #registerModItems()} so the
-	 * Fabric tab event is subscribed during mod init, not class-load.
+	 * Deferred {@link CreativeModeTabEvents#modifyOutputEvent} subscriptions, filled by
+	 * {@link #registerItem} and drained once at mod startup.
 	 */
 	private static List<Runnable> groupAddEntryActions = new ArrayList<>();
 
 	/**
-	 * Registers an item with optional mod dependencies and creative tab groups.
+	 * Registers an item under {@link DaggerCrafting#MOD_ID} and optionally schedules creative-tab output.
 	 *
-	 * @param name The name of the item to register.
-	 * @param factory A function that creates the item from the given {@link Item.Properties}.
-	 * @param properties The properties to use for the item (id is applied before the factory).
-	 * @param groups The creative tabs to which the item should be added.
-	 * @param dependencies Optional mod IDs that must be loaded for this item to be registered.
-	 * @return The registered Item, or null if any dependency is missing.
+	 * @param name registry path segment (e.g. {@code iron_dagger})
+	 * @param factory constructs the item after {@code properties} receive a registry id
+	 * @param properties base item properties; {@code setId} is applied before the factory runs
+	 * @param groups tabs that should list this item; {@code null} skips tab wiring
+	 * @param dependencies if any mod id is absent, registration is skipped and {@code null} is returned
+	 * @return the registered item, or {@code null} when a dependency is missing
 	 */
 	private static Item registerItem(
 		String name,
@@ -68,10 +74,12 @@ public class ModItems {
 	}
 
 	/**
-	 * Map of dagger name (e.g., "wooden_dagger") to registered Item instance.
+	 * Every throwable dagger tier keyed the same way as {@link DaggerToolMaterial#DAGGER_TOOL_MATERIALS}
+	 * and {@link ModEntities#DAGGER_ENTITY_TYPES}.
 	 */
 	public static final Map<String, Item> DAGGER_ITEMS;
 
+	// Build all dagger items as soon as this class loads (before onInitialize).
 	static {
 		Map<String, Item> map = new LinkedHashMap<>();
 		for (Map.Entry<String, DaggerToolMaterial> entry : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.entrySet()) {
@@ -87,8 +95,10 @@ public class ModItems {
 	}
 
 	/**
-	 * Registers all mod items to their respective creative tabs.
-	 * Should be called during mod initialization.
+	 * Subscribes queued creative-tab listeners so daggers appear under Combat.
+	 *
+	 * <p>Must run on the mod initializer thread during {@link DaggerCrafting#onInitialize()};
+	 * calling earlier would run before Fabric's tab event bus is ready.
 	 */
 	public static void registerModItems() {
 		DaggerCrafting.LOGGER.info("Adding Mod Items to creative tabs for " + DaggerCrafting.MOD_ID);
