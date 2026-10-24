@@ -1,7 +1,12 @@
 # Changelog
 
+## [1.2.1]
 
-
+### Changed
+- Built for Minecraft 26.3 (Fabric).
+- Thrown daggers follow 26.3 trident hit, bounce, and pierce rules.
+- Replaced the placeholder Fabric mod description with a real one.
+- Removed leftover debug console output from throws, entity setup, and enchant checks.
 
 ## [1.1.1]
 

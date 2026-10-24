@@ -57,8 +57,6 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 
 	public DaggerEntity(EntityType<? extends DaggerEntity> type, Level level) {
 		super(type, level);
-		System.out.println("DaggerEntity Constructor 1");
-		System.out.println("DaggerEntity Constructor 1 entityType: " + type);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,10 +68,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			stack,
 			null
 		);
-		System.out.println("DaggerEntity Constructor 2 stack: " + stack);
 		this.entityData.set(ID_LOYALTY, this.getLoyaltyFromItem(stack));
 		this.entityData.set(ID_FOIL, stack.hasFoil());
-		System.out.println("DaggerEntity Constructor 2");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,10 +83,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			stack,
 			null
 		);
-		System.out.println("DaggerEntity Constructor 3 stack: " + stack);
 		this.entityData.set(ID_LOYALTY, this.getLoyaltyFromItem(stack));
 		this.entityData.set(ID_FOIL, stack.hasFoil());
-		System.out.println("DaggerEntity Constructor 3");
 	}
 
 	private static Identifier getIdentifierFromStack(ItemStack stack) {
@@ -285,10 +279,9 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		Identifier itemId = Identifier.fromNamespaceAndPath(DaggerCrafting.MOD_ID, itemPath);
 		Item item = BuiltInRegistries.ITEM.getValue(itemId);
 		if (item != null && item != Items.AIR) {
-			System.out.println("DaggerEntity getDefaultPickupItem item SUCCESS");
 			return new ItemStack(item);
 		} else {
-			System.out.println("DaggerEntity getDefaultPickupItem item FAIL");
+			DaggerCrafting.LOGGER.warn("No pickup item for dagger entity type {}, falling back to diamond_dagger", itemPath);
 			return new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(DaggerCrafting.MOD_ID, "diamond_dagger")));
 		}
 	}
@@ -394,7 +387,6 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			velocity = new Vec3(velocity.x * Math.abs(velocity.x), velocity.y * Math.abs(velocity.y), velocity.z * Math.abs(velocity.z));
 			velocity = velocity.scale(baseKnockback * resistanceFactor * 0.15f);
 
-			System.out.println("DaggerEntity knockback length: " + velocity.length());
 			if (velocity.lengthSqr() > 0.0) {
 				target.push(velocity.x, Math.max(0.05, velocity.y), velocity.z);
 			}
