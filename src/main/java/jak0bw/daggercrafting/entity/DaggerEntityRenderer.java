@@ -54,7 +54,7 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 	 * Builds the world-space pose for the dagger model and enqueues it for the render graph.
 	 *
 	 * Does not call {@code super.submit}: parent would add a camera-facing duplicate after
-	 * {@code mulPose(camera.orientation)}, which 1.21.5+ behavior and pre-submit custom daggers avoided.
+	 * {@code rotate(camera.orientation)}, which 1.21.5+ behavior and pre-submit custom daggers avoided.
 	 */
 	@Override
 	public void submit(
@@ -72,7 +72,7 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 				(float) Math.toRadians(-daggerState.pitch),
 				0.0f
 			);
-			poseStack.mulPose(quaternion);
+			poseStack.rotate(quaternion);
 
 			// Second rotation: cosmetic tumble (70°→135° over 0.3s) plus 90° so the blade reads in GROUND context.
 			org.joml.Quaternionf quaternion2 = new org.joml.Quaternionf().rotationXYZ(
@@ -80,7 +80,7 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 				(float) Math.toRadians(90),
 				0.0f
 			);
-			poseStack.mulPose(quaternion2);
+			poseStack.rotate(quaternion2);
 		}
 		flyingItemEntityRenderState.item.submit(
 			poseStack,
@@ -90,7 +90,7 @@ public class DaggerEntityRenderer extends ThrownItemRenderer<DaggerEntity> {
 			flyingItemEntityRenderState.outlineColor
 		);
 		poseStack.popPose();
-		// ThrownItemRenderer.submit also draws the stack after mulPose(camera.orientation),
+		// ThrownItemRenderer.submit also draws the stack after rotate(camera.orientation),
 		// which is the camera-facing copy. 1.21.5 never called super.render().
 	}
 
