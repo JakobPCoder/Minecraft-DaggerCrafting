@@ -9,7 +9,6 @@
   - Daggers stuck in a block emit a slow end-rod wisp so missed throws are easier to spot again.
 
 ### Changed
-- Built for Minecraft 26.3 (Fabric).
 - Dagger enchantment compatibility now matches vanilla ids exactly, so the allowed set stays closed and other mods are less likely to leak onto daggers.
 - Cleaned unused Throwing Speed datapack fields; table offers and throw behavior are unchanged.
 
@@ -23,7 +22,6 @@
 ## [1.2.1]
 
 ### Changed
-- Built for Minecraft 26.2 (Fabric, official names).
 - Replaced the placeholder Fabric mod description with a real one.
 - Removed leftover debug console output from throws, entity setup, and enchant checks.
 
