@@ -2,12 +2,13 @@ package jak0bw.daggercrafting.entity;
 
 import jak0bw.daggercrafting.DaggerCrafting;
 import jak0bw.daggercrafting.DaggerToolMaterial;
+import jak0bw.daggercrafting.ModEnchantments;
 import jak0bw.daggercrafting.item.DaggerItem;
-import jak0bw.daggercrafting.particle.ParticleCue;
 import jak0bw.daggercrafting.particle.ParticleDirector;
-import jak0bw.daggercrafting.particle.ParticleHitContext;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -120,6 +122,12 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 	 * Value is in ticks under the constant-speed assumption used for audio only.
 	 */
 	private static final int APPROACH_SOUND_THRESHOLD_TICKS = 5;
+
+	/** Pitch of both loyalty return cues before the per-level shift. */
+	private static final float RETURN_SOUND_BASE_PITCH = 0.8F;
+
+	/** Volume of the last-moment loyalty catch cue (also used by Restitution). */
+	private static final float ARRIVAL_SOUND_VOLUME = 1.4F;
 
 	/**
 	 * Scales {@link DaggerToolMaterial#getRangedVelocity()} into max return speed per loyalty level.
@@ -230,17 +238,14 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 				this.applyLinearReturnMotion(entity, loyalty);
 
 				double timeToTarget = this.predictTimeToTarget(entity);
-				float basePitch = 0.8f;
-				float shiftUpFactor = 1.0F + 0.5F * (float) loyalty;
 				if (timeToTarget < APPROACH_SOUND_THRESHOLD_TICKS && !approachingTargetSoundPlayed) {
-					// Arrival cue, 30% quieter than the previous 2.0 volume.
-					this.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 1.4F, basePitch * shiftUpFactor);
+					this.playReturnArrivalSound(loyalty);
 					approachingTargetSoundPlayed = true;
 				}
 
 				if (this.returnTimer == 0) {
 					// Start-of-return cue, 30% quieter than the previous 0.7 volume.
-					this.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 0.49F, basePitch);
+					this.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 0.49F, RETURN_SOUND_BASE_PITCH);
 				}
 				this.returnTimer++;
 			}
@@ -351,11 +356,6 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 
 		this.dealtDamage = true;
 		if (targetEntity.hurtOrSimulate(damageSource, damageAmount)) {
-			// Endermen teleport away; skip knockback/enchant follow-up that assumes a stable target.
-			if (targetEntity.is(EntityTypes.ENDERMAN)) {
-				return;
-			}
-
 			if (this.level() instanceof ServerLevel serverLevel) {
 				EnchantmentHelper.doPostAttackEffectsWithItemSourceOnBreak(
 					serverLevel,
@@ -366,7 +366,9 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 				);
 			}
 
-			if (targetEntity instanceof LivingEntity livingEntity) {
+			// Endermen teleport away; knockback and post-hurt assume a stable target.
+			// Restitution still runs after this block, so this must not return early.
+			if (!targetEntity.is(EntityTypes.ENDERMAN) && targetEntity instanceof LivingEntity livingEntity) {
 				this.doKnockback(livingEntity, damageSource);
 				this.doPostHurtEffects(livingEntity);
 			}
@@ -380,6 +382,70 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false);
 		this.setDeltaMovement(this.getDeltaMovement().multiply(0.02, 0.2, 0.02));
 		this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
+		this.tryRestitutionReturn();
+	}
+
+	/**
+	 * Instant inventory return for Restitution after a thrown entity hit.
+	 *
+	 * Contact is enough: blocked or zero-damage hits still return. Breaks skip this because
+	 * {@link EnchantmentHelper#doPostAttackEffectsWithItemSourceOnBreak} already {@link #kill killed}
+	 * the projectile. Non-player owners keep the entity in the world so dispensers cannot delete the stack.
+	 * Creative / infinite-materials owners already kept the original item, so only the projectile is removed.
+	 */
+	/**
+	 * True when the thrown stack has Restitution. Safe on client and server via world registries.
+	 *
+	 * @return {@code false} if the datapack enchantment is missing or the stack is unenchanted
+	 */
+	public boolean hasRestitution() {
+		Holder<Enchantment> restitution = this.level().registryAccess()
+			.lookupOrThrow(Registries.ENCHANTMENT)
+			.get(ModEnchantments.RESTITUTION)
+			.orElse(null);
+		if (restitution == null) {
+			return false;
+		}
+		return EnchantmentHelper.getItemEnchantmentLevel(restitution, this.getPickupItemStackOrigin()) > 0;
+	}
+
+	private void tryRestitutionReturn() {
+		if (!(this.level() instanceof ServerLevel serverLevel) || this.isRemoved()) {
+			return;
+		}
+		if (!this.hasRestitution()) {
+			return;
+		}
+
+		Entity owner = this.getOwner();
+		if (!(owner instanceof ServerPlayer player) || !player.isAlive() || player.isSpectator()) {
+			return;
+		}
+
+		// Same last-moment catch cue as Loyalty; Restitution cannot coexist so pitch uses level I.
+		this.playReturnArrivalSound(1);
+
+		// Creative never consumes the thrown stack, so returning it would duplicate.
+		if (!player.hasInfiniteMaterials()) {
+			ItemStack stack = this.getPickupItem();
+			if (!player.getInventory().add(stack)) {
+				this.spawnAtLocation(serverLevel, stack, 0.1F);
+			}
+		}
+
+		this.discard();
+	}
+
+	/**
+	 * Last-moment catch cue used by Loyalty approach and Restitution instant return.
+	 *
+	 * Pitch rises with loyalty level: {@code 0.8 * (1 + 0.5 * level)}.
+	 *
+	 * @param loyaltyLevel 1–3 for Loyalty, or 1 for Restitution so the catch is audible
+	 */
+	private void playReturnArrivalSound(int loyaltyLevel) {
+		float shiftUpFactor = 1.0F + 0.5F * (float) loyaltyLevel;
+		this.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, ARRIVAL_SOUND_VOLUME, RETURN_SOUND_BASE_PITCH * shiftUpFactor);
 	}
 
 	/**
@@ -389,10 +455,9 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 	protected void onHitBlock(BlockHitResult blockHitResult) {
 		Vec3 motion = this.getDeltaMovement();
 		if (this.level().isClientSide()) {
-			ParticleDirector.emit(
-				ParticleCue.HIT_BLOCK,
+			ParticleDirector.hitBlock(
 				this,
-				new ParticleHitContext(
+				new ParticleDirector.HitContext(
 					blockHitResult.getLocation(),
 					motion,
 					this.level().getBlockState(blockHitResult.getBlockPos()),

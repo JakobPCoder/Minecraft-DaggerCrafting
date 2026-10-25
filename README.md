@@ -62,6 +62,8 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
     *   The **Throwing Speed** enchantment (Levels I-III) is a game-changer for ranged dagger combat. Each level significantly boosts your dagger's initial throwing velocity, leading to:
     *   **Extended Range**: Hit targets from much further away.
     *   **Increased Knockback**: Amplify the unique velocity-based knockback, sending foes reeling. This enchantment truly unlocks the full potential of daggers as a primary ranged weapon.
+*   **Restitution** (Level I)
+    *   On a thrown hit against an entity, including a fully blocked hit, the dagger is put back in the thrower's inventory immediately. Misses and block-only landings do not return. Cannot be combined with Loyalty.
 
 ## Stats
 

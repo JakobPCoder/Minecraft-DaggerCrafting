@@ -1,0 +1,20 @@
+{
+  "description": {
+    "translate": "enchantment.daggercrafting.restitution"
+  },
+  "supported_items": "#daggercrafting:daggers",
+  "primary_items": "#daggercrafting:daggers",
+  "exclusive_set": "minecraft:loyalty",
+  "weight": 5,
+  "max_level": 1,
+  "min_cost": {
+    "base": 3,
+    "per_level_above_first": 5
+  },
+  "max_cost": {
+    "base": 8,
+    "per_level_above_first": 15
+  },
+  "anvil_cost": 2,
+  "slots": ["mainhand"]
+}

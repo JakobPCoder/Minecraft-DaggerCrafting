@@ -1,8 +1,6 @@
 package jak0bw.daggercrafting.particle;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import jak0bw.daggercrafting.DaggerCrafting;
 
@@ -23,11 +21,35 @@ public final class ParticlePresets {
 	/** Exclusive channel for block-stick crumbs. Separate from trails so fire cannot replace the burst. */
 	public static final String GROUP_IMPACT_BLOCK = "impact.block";
 
+	/** Exclusive channel for stuck-in-block idle wisps. */
+	public static final String GROUP_GROUND = "ground.idle";
+
+	/**
+	 * Named bundle of spawn specs that compete or layer inside one exclusive {@link #group}.
+	 *
+	 * {@link ParticleContributors} resolves each group: {@link #replaceGroup()} true means only the
+	 * highest {@link #priority()} preset in that group runs; {@code false} stacks on top of the winner.
+	 *
+	 * @param id registry-style key, e.g. {@code daggercrafting:trail/default}
+	 * @param group exclusive channel such as {@code trail} or {@code impact.block}
+	 * @param priority higher wins when {@code replaceGroup} is set
+	 * @param replaceGroup when true, this preset is a mutually exclusive candidate for {@code group}
+	 * @param specs layers spawned together (flame + small flame + smoke)
+	 */
+	public record Preset(
+		Identifier id,
+		String group,
+		int priority,
+		boolean replaceGroup,
+		List<ParticleSpawnSpec> specs
+	) {
+	}
+
 	/**
 	 * Crit-spark line: density and size lerp with throw charge (min tap → full).
 	 * Full charge stays under the previous 8 / 0.4 look.
 	 */
-	public static final ParticlePreset DEFAULT_TRAIL = new ParticlePreset(
+	public static final Preset DEFAULT_TRAIL = new Preset(
 		id("trail/default"),
 		GROUP_TRAIL,
 		0,
@@ -38,7 +60,7 @@ public final class ParticlePresets {
 				3,
 				6,
 				0.02,
-				VelocityMode.OPPOSE_MOTION,
+				ParticleSpawnSpec.VelocityMode.OPPOSE_MOTION,
 				1.0f,
 				0.18f,
 				0.32f
@@ -50,7 +72,7 @@ public final class ParticlePresets {
 	 * On-fire replacement trail: flame body plus smaller fill, sparse smoke. Near-zero aux velocity
 	 * so vanilla flame rise/flicker animates in place along the path.
 	 */
-	public static final ParticlePreset BLAZING_TRAIL = new ParticlePreset(
+	public static final Preset BLAZING_TRAIL = new Preset(
 		id("trail/blazing"),
 		GROUP_TRAIL,
 		10,
@@ -61,7 +83,7 @@ public final class ParticlePresets {
 				3,
 				5,
 				0.02,
-				VelocityMode.ZERO,
+				ParticleSpawnSpec.VelocityMode.ZERO,
 				1.0f,
 				0.22f,
 				0.36f
@@ -71,7 +93,7 @@ public final class ParticlePresets {
 				2,
 				3,
 				0.025,
-				VelocityMode.ZERO,
+				ParticleSpawnSpec.VelocityMode.ZERO,
 				1.0f,
 				0.25f,
 				0.40f
@@ -82,7 +104,7 @@ public final class ParticlePresets {
 				2,
 				2,
 				0.03,
-				VelocityMode.UPWARD_BIAS,
+				ParticleSpawnSpec.VelocityMode.UPWARD_BIAS,
 				0.5f,
 				0.20f,
 				0.32f
@@ -95,7 +117,7 @@ public final class ParticlePresets {
 	 * impact speed; crumbs also inherit a fraction of that velocity. Texture comes from the hit
 	 * {@code BlockState} at spawn time.
 	 */
-	public static final ParticlePreset DEFAULT_BLOCK_IMPACT = new ParticlePreset(
+	public static final Preset DEFAULT_BLOCK_IMPACT = new Preset(
 		id("impact/block/default"),
 		GROUP_IMPACT_BLOCK,
 		0,
@@ -109,27 +131,31 @@ public final class ParticlePresets {
 		)
 	);
 
-	private static final Map<Identifier, ParticlePreset> BY_ID = new HashMap<>();
-
-	static {
-		register(DEFAULT_TRAIL);
-		register(BLAZING_TRAIL);
-		register(DEFAULT_BLOCK_IMPACT);
-	}
+	/**
+	 * Slim end-rod wisp while any dagger sits in a block.
+	 *
+	 * {@code END_ROD} is the one vanilla type that is already a thin, faintly purple spark with a
+	 * long fade (~3s) and no extra burst sprites. Spawn is sparse so overlapping lives read as one
+	 * calm column, not a fountain.
+	 */
+	public static final Preset STUCK_GROUND = new Preset(
+		id("ground/stuck"),
+		GROUP_GROUND,
+		0,
+		true,
+		List.of(
+			ParticleSpawnSpec.groundWisp(
+				ParticleTypes.END_ROD,
+				40,
+				0.05,
+				ParticleSpawnSpec.VelocityMode.SLOW_RISE,
+				1.0f,
+				0.38f
+			)
+		)
+	);
 
 	private ParticlePresets() {
-	}
-
-	/**
-	 * @param presetId key passed from a {@link ParticleContribution}
-	 * @return preset or {@code null} if the contributor referenced an unknown id
-	 */
-	public static ParticlePreset get(Identifier presetId) {
-		return BY_ID.get(presetId);
-	}
-
-	private static void register(ParticlePreset preset) {
-		BY_ID.put(preset.id(), preset);
 	}
 
 	private static Identifier id(String path) {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import jak0bw.daggercrafting.entity.DaggerEntity;
 
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -12,15 +13,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
 /**
- * Spawns client particles for the presets contributors selected this tick or hit.
+ * Spawns client particles for the presets {@link ParticleContributors} selected this tick or hit.
  *
  * Default spawn is {@link Level#addParticle} (server no-op, vanilla size). The client replaces
  * {@link #SPAWNER} so {@link ParticleSpawnSpec#quadScale()} can shrink the same vanilla sprites.
  * Trails sample the segment just simulated: {@code position - delta} toward {@code position}.
- * Block hits spawn radial {@code BLOCK} crumbs from a pre-stick {@link ParticleHitContext}.
+ * Block hits spawn radial {@code BLOCK} crumbs from a pre-stick {@link HitContext}.
  */
 public final class ParticleDirector {
 
@@ -30,7 +30,7 @@ public final class ParticleDirector {
 	/** Nudge spawn origin off the surface so the first frame is not inside the block. */
 	private static final double SURFACE_NUDGE = 0.02;
 
-	private static ParticleSpawner SPAWNER = (
+	private static Spawner SPAWNER = (
 		level,
 		particle,
 		x,
@@ -46,47 +46,65 @@ public final class ParticleDirector {
 	}
 
 	/**
-	 * Installs the client engine path that honors {@code quadScale}. Called from client init only.
+	 * Side-specific spawn: common code uses {@link Level#addParticle} (ignores scale); the client
+	 * replaces this with engine {@code createParticle} plus {@link net.minecraft.client.particle.Particle#scale}.
 	 */
-	public static void setSpawner(ParticleSpawner spawner) {
+	@FunctionalInterface
+	public interface Spawner {
+
+		/**
+		 * @param quadScale multiplier on the vanilla quad after construction; {@code 1} leaves default size
+		 */
+		void spawn(
+			Level level,
+			ParticleOptions particle,
+			double x,
+			double y,
+			double z,
+			double xd,
+			double yd,
+			double zd,
+			float quadScale
+		);
+	}
+
+	/**
+	 * Snapshot of a block strike taken before arrow stick logic zeros velocity.
+	 *
+	 * @param origin world contact point from the hit result
+	 * @param motion dagger delta-movement at impact (pre-stick)
+	 * @param state block that was hit; used to build {@code BlockParticleOption}
+	 * @param face struck face; crumbs bias along its outward normal
+	 */
+	public record HitContext(
+		Vec3 origin,
+		Vec3 motion,
+		BlockState state,
+		Direction face
+	) {
+	}
+
+	/**
+	 * Installs the client engine path that honors {@code quadScale}. Called from client init only.
+	 *
+	 * @param spawner client implementation
+	 */
+	public static void setSpawner(Spawner spawner) {
 		SPAWNER = spawner;
 	}
 
-	/** In-flight trail hook; call after {@code super.tick()} so position/velocity include this frame's move. */
+	/**
+	 * In-flight trail hook. Call after {@code super.tick()} so position and velocity include this
+	 * frame's move.
+	 *
+	 * @param dagger source projectile
+	 */
 	public static void tick(DaggerEntity dagger) {
-		emit(ParticleCue.TRAIL_TICK, dagger, null);
-	}
-
-	/**
-	 * Cue entry without a hit snapshot (trails).
-	 *
-	 * @param cue moment being requested
-	 * @param dagger source projectile
-	 */
-	public static void emit(ParticleCue cue, DaggerEntity dagger) {
-		emit(cue, dagger, null);
-	}
-
-	/**
-	 * Cue entry for trails and block impacts.
-	 *
-	 * @param cue moment being requested
-	 * @param dagger source projectile
-	 * @param hit pre-stick contact snapshot; required for {@link ParticleCue#HIT_BLOCK}
-	 */
-	public static void emit(ParticleCue cue, DaggerEntity dagger, @Nullable ParticleHitContext hit) {
 		if (!dagger.level().isClientSide()) {
 			return;
 		}
-		if (cue == ParticleCue.HIT_BLOCK) {
-			emitBlockHit(dagger, hit);
-			return;
-		}
-		if (cue != ParticleCue.TRAIL_TICK) {
-			return;
-		}
 
-		List<ParticlePreset> presets = ParticleContributors.resolve(dagger);
+		List<ParticlePresets.Preset> presets = ParticleContributors.resolve(dagger);
 		if (presets.isEmpty()) {
 			return;
 		}
@@ -95,7 +113,7 @@ public final class ParticleDirector {
 		Vec3 motion = dagger.getDeltaMovement();
 		Vec3 start = end.subtract(motion);
 
-		for (ParticlePreset preset : presets) {
+		for (ParticlePresets.Preset preset : presets) {
 			for (ParticleSpawnSpec spec : preset.specs()) {
 				emitTrailSpec(dagger, spec, start, motion);
 			}
@@ -104,25 +122,29 @@ public final class ParticleDirector {
 
 	/**
 	 * One-shot radial crumbs at the contact point. Skips air and blocks that hide terrain particles.
+	 *
+	 * @param dagger source projectile
+	 * @param hit pre-stick contact snapshot
 	 */
-	private static void emitBlockHit(DaggerEntity dagger, @Nullable ParticleHitContext hit) {
-		if (hit == null) {
+	public static void hitBlock(DaggerEntity dagger, HitContext hit) {
+		if (!dagger.level().isClientSide()) {
 			return;
 		}
+
 		BlockState state = hit.state();
 		if (state.isAir() || !state.shouldSpawnTerrainParticles()) {
 			return;
 		}
 
-		List<ParticlePreset> presets = ParticleContributors.resolve(dagger);
+		List<ParticlePresets.Preset> presets = ParticleContributors.resolve(dagger);
 		if (presets.isEmpty()) {
 			return;
 		}
 
 		ParticleOptions particle = new BlockParticleOption(ParticleTypes.BLOCK, state);
-		for (ParticlePreset preset : presets) {
+		for (ParticlePresets.Preset preset : presets) {
 			for (ParticleSpawnSpec spec : preset.specs()) {
-				if (spec.placement() == ParticlePlacement.IMPACT_RADIAL) {
+				if (spec.placement() == ParticleSpawnSpec.Placement.IMPACT_RADIAL) {
 					emitRadialBurst(dagger, spec, hit, particle);
 				}
 			}
@@ -137,7 +159,7 @@ public final class ParticleDirector {
 		if (dagger.tickCount % period != 0) {
 			return;
 		}
-		if (spec.placement() != ParticlePlacement.MOTION_SUBSTEPS) {
+		if (spec.placement() != ParticleSpawnSpec.Placement.MOTION_SUBSTEPS) {
 			return;
 		}
 		if (spec.particle() == null) {
@@ -180,7 +202,7 @@ public final class ParticleDirector {
 	private static void emitRadialBurst(
 		DaggerEntity dagger,
 		ParticleSpawnSpec spec,
-		ParticleHitContext hit,
+		HitContext hit,
 		ParticleOptions particle
 	) {
 		ParticleSpawnSpec.RadialBurst burst = spec.burst();

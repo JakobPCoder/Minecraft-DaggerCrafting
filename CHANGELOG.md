@@ -1,10 +1,23 @@
 # Changelog
 
+## [1.4.0]
+
+### Added
+- Restitution (level I): a thrown dagger that hits an entity, including a fully blocked hit, returns to the thrower's inventory the same tick. Misses stay in the world. Incompatible with Loyalty.
+- Throwing Speed and Restitution can now appear on exploration loot and librarian trades, not only at the enchanting table.
+- Particle Effects
+  - Daggers stuck in a block emit a slow end-rod wisp so missed throws are easier to spot again.
+
+### Changed
+- Dagger enchantment compatibility now matches vanilla ids exactly, so the allowed set stays closed and other mods are less likely to leak onto daggers.
+- Cleaned unused Throwing Speed datapack fields; table offers and throw behavior are unchanged.
+
 ## [1.3.0]
 
 ### Added
-- Client particle trails on thrown daggers (crit sparks; on-fire throws use flame and smoke).
-- Speed-scaled terrain crumb bursts when a thrown dagger hits a block.
+- Particle Effects
+  - Client particle trails on thrown daggers (crit sparks; on-fire throws use flame and smoke).
+  - Speed-scaled terrain crumb bursts when a thrown dagger hits a block.
 
 ## [1.2.1]
 

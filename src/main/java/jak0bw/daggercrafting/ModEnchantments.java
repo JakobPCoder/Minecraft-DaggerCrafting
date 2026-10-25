@@ -9,7 +9,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
  * Stable {@link ResourceKey} handles for dagger enchantments defined in datapacks.
  *
  * Enchantment behavior and levels live under {@code data/daggercrafting/enchantment/*.json}.
- * Java code references {@link #THROWING_SPEED} (and future keys) for checks in
+ * Java code references {@link #THROWING_SPEED} and {@link #RESTITUTION} for checks in
  * {@link jak0bw.daggercrafting.item.DaggerItem} or entity logic without hard-coding raw ids.
  */
 public class ModEnchantments {
@@ -20,6 +20,13 @@ public class ModEnchantments {
 	 * @see Registries#ENCHANTMENT
 	 */
 	public static final ResourceKey<Enchantment> THROWING_SPEED = of("throwing_speed");
+
+	/**
+	 * Datapack enchantment that returns a thrown dagger to the thrower on an entity hit.
+	 *
+	 * @see Registries#ENCHANTMENT
+	 */
+	public static final ResourceKey<Enchantment> RESTITUTION = of("restitution");
 
 	/**
 	 * @param path enchantment id path within {@link DaggerCrafting#MOD_ID}
