@@ -9,6 +9,8 @@
   - Daggers stuck in a block emit a slow end-rod wisp so missed throws are easier to spot again.
 
 ### Changed
+- Built for Minecraft 26.3 (Fabric).
+- Thrown daggers follow 26.3 trident hit, bounce, and pierce rules.
 - Dagger enchantment compatibility now matches vanilla ids exactly, so the allowed set stays closed and other mods are less likely to leak onto daggers.
 - Cleaned unused Throwing Speed datapack fields; table offers and throw behavior are unchanged.
 

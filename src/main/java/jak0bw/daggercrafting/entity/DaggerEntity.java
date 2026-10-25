@@ -6,6 +6,9 @@ import jak0bw.daggercrafting.ModEnchantments;
 import jak0bw.daggercrafting.item.DaggerItem;
 import jak0bw.daggercrafting.particle.ParticleDirector;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,7 +24,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -275,7 +277,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		if (!this.level().isClientSide()) {
 			double velocitySquared = this.getDeltaMovement().lengthSqr();
 			if (velocitySquared > 2.0) {
-				this.hurtMarked = true;
+				// 26.3: hurtMarked became a public flag that schedules a velocity packet.
+				this.syncVelocity = true;
 			}
 		}
 	}
@@ -328,6 +331,15 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 	}
 
 	/**
+	 * Tridents are not piercing arrows: collide with at most one entity per step.
+	 */
+	@Override
+	protected Collection<EntityHitResult> findHitEntities(Vec3 currentPosition, Vec3 nextPosition) {
+		EntityHitResult hit = this.findHitEntity(currentPosition, nextPosition);
+		return hit != null ? List.of(hit) : List.of();
+	}
+
+	/**
 	 * Tier stats from the pickup stack; falls back to diamond in {@link DaggerItem#getMaterialFromItem} if corrupt.
 	 */
 	public DaggerToolMaterial getMaterial() {
@@ -355,7 +367,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		}
 
 		this.dealtDamage = true;
-		if (targetEntity.hurtOrSimulate(damageSource, damageAmount)) {
+		boolean wasHurt = targetEntity.hurtOrSimulate(damageSource, damageAmount);
+		if (wasHurt) {
 			if (this.level() instanceof ServerLevel serverLevel) {
 				EnchantmentHelper.doPostAttackEffectsWithItemSourceOnBreak(
 					serverLevel,
@@ -366,9 +379,7 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 				);
 			}
 
-			// Endermen teleport away; knockback and post-hurt assume a stable target.
-			// Restitution still runs after this block, so this must not return early.
-			if (!targetEntity.is(EntityTypes.ENDERMAN) && targetEntity instanceof LivingEntity livingEntity) {
+			if (targetEntity instanceof LivingEntity livingEntity) {
 				this.doKnockback(livingEntity, damageSource);
 				this.doPostHurtEffects(livingEntity);
 			}
@@ -378,21 +389,14 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 			living.igniteForSeconds(4);
 		}
 
-		// Nearly stop forward motion so loyalty pull can take over on the next tick.
-		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false);
-		this.setDeltaMovement(this.getDeltaMovement().multiply(0.02, 0.2, 0.02));
-		this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
+		// Endermen and similar targets opt out here instead of an EntityTypes.ENDERMAN early return.
+		if (targetEntity.projectileReceivesSideEffectsOnHit(wasHurt)) {
+			this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
+			this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
+		}
 		this.tryRestitutionReturn();
 	}
 
-	/**
-	 * Instant inventory return for Restitution after a thrown entity hit.
-	 *
-	 * Contact is enough: blocked or zero-damage hits still return. Breaks skip this because
-	 * {@link EnchantmentHelper#doPostAttackEffectsWithItemSourceOnBreak} already {@link #kill killed}
-	 * the projectile. Non-player owners keep the entity in the world so dispensers cannot delete the stack.
-	 * Creative / infinite-materials owners already kept the original item, so only the projectile is removed.
-	 */
 	/**
 	 * True when the thrown stack has Restitution. Safe on client and server via world registries.
 	 *
@@ -409,6 +413,14 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		return EnchantmentHelper.getItemEnchantmentLevel(restitution, this.getPickupItemStackOrigin()) > 0;
 	}
 
+	/**
+	 * Instant inventory return for Restitution after a thrown entity hit.
+	 *
+	 * Contact is enough: blocked or zero-damage hits still return. Breaks skip this because
+	 * {@link EnchantmentHelper#doPostAttackEffectsWithItemSourceOnBreak} already {@link #kill killed}
+	 * the projectile. Non-player owners keep the entity in the world so dispensers cannot delete the stack.
+	 * Creative / infinite-materials owners already kept the original item, so only the projectile is removed.
+	 */
 	private void tryRestitutionReturn() {
 		if (!(this.level() instanceof ServerLevel serverLevel) || this.isRemoved()) {
 			return;
