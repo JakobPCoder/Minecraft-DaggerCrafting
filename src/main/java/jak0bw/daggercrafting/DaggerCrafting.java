@@ -1,9 +1,7 @@
 package jak0bw.daggercrafting;
 
-import jak0bw.daggercrafting.particle.BurningTrailContributor;
-import jak0bw.daggercrafting.particle.DefaultBlockImpactContributor;
-import jak0bw.daggercrafting.particle.DefaultTrailContributor;
 import jak0bw.daggercrafting.particle.ParticleContributors;
+import jak0bw.daggercrafting.particle.ParticlePresets;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -35,7 +33,7 @@ public class DaggerCrafting implements ModInitializer {
 	 * (one per {@link DaggerToolMaterial} tier), then creative-tab hooks for items. Item
 	 * instances are created earlier in {@link ModItems}'s static initializer when that class
 	 * is first referenced; {@link ModItems#registerModItems()} only flushes deferred tab events.
-	 * Particle trail contributors register last so they can read fully constructed entities at runtime.
+	 * Extra particle factors register last so they can read fully constructed entities at runtime.
 	 */
 	@Override
 	public void onInitialize() {
@@ -44,8 +42,12 @@ public class DaggerCrafting implements ModInitializer {
 		ModEnchantments.registerModEnchantments();
 		ModEntities.registerModEntities();
 		ModItems.registerModItems();
-		ParticleContributors.register(new DefaultTrailContributor());
-		ParticleContributors.register(new BurningTrailContributor());
-		ParticleContributors.register(new DefaultBlockImpactContributor());
+		ParticleContributors.register((dagger, out) -> {
+			// Vanilla Flame ignites via projectile_spawned; Fire Aspect does not, so melee fire
+			// stays off the trail. Any other ignite source gets the blazing trail for free.
+			if (dagger.isOnFire()) {
+				out.add(ParticlePresets.BLAZING_TRAIL);
+			}
+		});
 	}
 }

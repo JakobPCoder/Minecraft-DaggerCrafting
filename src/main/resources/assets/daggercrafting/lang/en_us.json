@@ -10,5 +10,6 @@
   "item.daggercrafting.dagger.when_thrown": "When thrown:",
   "item.daggercrafting.dagger.ranged_damage": "%s Ranged Damage",
   "item.daggercrafting.dagger.ranged_velocity": "%s Ranged Velocity",
-  "enchantment.daggercrafting.throwing_speed": "Throwing Speed"
+  "enchantment.daggercrafting.throwing_speed": "Throwing Speed",
+  "enchantment.daggercrafting.restitution": "Restitution"
 } 

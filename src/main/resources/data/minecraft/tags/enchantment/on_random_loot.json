@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "daggercrafting:throwing_speed",
+    "daggercrafting:restitution"
+  ]
+}
