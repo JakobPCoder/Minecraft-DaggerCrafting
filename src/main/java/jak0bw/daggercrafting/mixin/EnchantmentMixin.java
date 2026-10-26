@@ -4,10 +4,10 @@ import java.util.Set;
 
 import jak0bw.daggercrafting.item.DaggerItem;
 
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.Identifier;
+import net.minecraft.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -67,14 +67,14 @@ public class EnchantmentMixin {
 	 * @return identifier compared with {@link #enchantmentIdFromDescription}
 	 */
 	private static Identifier id(String namespace, String path) {
-		return Identifier.fromNamespaceAndPath(namespace, path);
+		return Identifier.of(namespace, path);
 	}
 
 	/**
 	 * Shared gate for injector methods: only daggers are affected; other items keep vanilla results.
 	 *
 	 * When the enchantment description is not a matching translate key, this returns without setting
-	 * {@code cir} so vanilla {@code canEnchant} / {@code isPrimaryItem} run. Unknown datapack
+	 * {@code cir} so vanilla {@code isAcceptableItem} / {@code isPrimaryItem} run. Unknown datapack
 	 * enchantments therefore stay off daggers unless their own {@code supported_items} already include
 	 * them.
 	 *
@@ -105,11 +105,11 @@ public class EnchantmentMixin {
 	 * description types (literal text, unexpected keys) return {@code null} so they are not
 	 * allow-listed.
 	 *
-	 * @param self enchantment whose {@link Enchantment#description()} is inspected
+	 * @param self enchantment whose description text is inspected
 	 * @return parsed id, or {@code null} when the key is not {@code enchantment.ns.path}
 	 */
 	private static Identifier enchantmentIdFromDescription(Enchantment self) {
-		if (!(self.description().getContents() instanceof TranslatableContents translatable)) {
+		if (!(self.description().getContent() instanceof TranslatableTextContent translatable)) {
 			return null;
 		}
 		String key = translatable.getKey();
@@ -128,11 +128,11 @@ public class EnchantmentMixin {
 	}
 
 	/**
-	 * Anvil (and book apply) path: {@link Enchantment#canEnchant(ItemStack)}.
+	 * Anvil (and book apply) path: {@link Enchantment#isAcceptableItem(ItemStack)}.
 	 *
 	 * Includes {@code minecraft:mending}, which is intentionally omitted from the table hook below.
 	 */
-	@Inject(method = "canEnchant", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "isAcceptableItem", at = @At("HEAD"), cancellable = true)
 	private void allowEnchantmentOnAnvil(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 		shouldAllowEnchantment((Enchantment) (Object) this, stack, cir, ANVIL_IDS);
 	}

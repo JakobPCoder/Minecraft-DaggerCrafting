@@ -1,12 +1,12 @@
 package jak0bw.daggercrafting;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
 
 /**
- * Stable {@link ResourceKey} handles for dagger enchantments defined in datapacks.
+ * Stable {@link RegistryKey} handles for dagger enchantments defined in datapacks.
  *
  * Enchantment behavior and levels live under {@code data/daggercrafting/enchantment/*.json}.
  * Java code references {@link #THROWING_SPEED} and {@link #RESTITUTION} for checks in
@@ -17,24 +17,24 @@ public class ModEnchantments {
 	/**
 	 * Datapack enchantment that modifies thrown dagger speed or related ballistics.
 	 *
-	 * @see Registries#ENCHANTMENT
+	 * @see RegistryKeys#ENCHANTMENT
 	 */
-	public static final ResourceKey<Enchantment> THROWING_SPEED = of("throwing_speed");
+	public static final RegistryKey<Enchantment> THROWING_SPEED = of("throwing_speed");
 
 	/**
 	 * Datapack enchantment that returns a thrown dagger to the thrower on an entity hit.
 	 *
-	 * @see Registries#ENCHANTMENT
+	 * @see RegistryKeys#ENCHANTMENT
 	 */
-	public static final ResourceKey<Enchantment> RESTITUTION = of("restitution");
+	public static final RegistryKey<Enchantment> RESTITUTION = of("restitution");
 
 	/**
 	 * @param path enchantment id path within {@link DaggerCrafting#MOD_ID}
 	 * @return key suitable for registry lookups once the world/datapack is loaded
 	 */
-	private static ResourceKey<Enchantment> of(String path) {
-		Identifier id = Identifier.fromNamespaceAndPath(DaggerCrafting.MOD_ID, path);
-		return ResourceKey.create(Registries.ENCHANTMENT, id);
+	private static RegistryKey<Enchantment> of(String path) {
+		Identifier id = Identifier.of(DaggerCrafting.MOD_ID, path);
+		return RegistryKey.of(RegistryKeys.ENCHANTMENT, id);
 	}
 
 	/**

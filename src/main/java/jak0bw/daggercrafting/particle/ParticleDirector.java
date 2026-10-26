@@ -4,20 +4,20 @@ import java.util.List;
 
 import jak0bw.daggercrafting.entity.DaggerEntity;
 
-import net.minecraft.core.Direction;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.block.BlockState;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 
 /**
  * Spawns client particles for the presets {@link ParticleContributors} selected this tick or hit.
  *
- * Default spawn is {@link Level#addParticle} (server no-op, vanilla size). The client replaces
+ * Default spawn is a no-op until the client replaces {@link #SPAWNER} (vanilla size). The client replaces
  * {@link #SPAWNER} so {@link ParticleSpawnSpec#quadScale()} can shrink the same vanilla sprites.
  * Trails sample the segment just simulated: {@code position - delta} toward {@code position}.
  * Block hits spawn radial {@code BLOCK} crumbs from a pre-stick {@link HitContext}.
@@ -31,7 +31,7 @@ public final class ParticleDirector {
 	private static final double SURFACE_NUDGE = 0.02;
 
 	private static Spawner SPAWNER = (
-		level,
+		world,
 		particle,
 		x,
 		y,
@@ -40,13 +40,15 @@ public final class ParticleDirector {
 		yd,
 		zd,
 		quadScale
-	) -> level.addParticle(particle, x, y, z, xd, yd, zd);
+	) -> {
+		// Client init installs {@link jak0bw.daggercrafting.DaggerCraftingClient#spawnScaledParticle}.
+	};
 
 	private ParticleDirector() {
 	}
 
 	/**
-	 * Side-specific spawn: common code uses {@link Level#addParticle} (ignores scale); the client
+	 * Side-specific spawn: common code uses {@link World#addParticle} (ignores scale); the client
 	 * replaces this with engine {@code createParticle} plus {@link net.minecraft.client.particle.Particle#scale}.
 	 */
 	@FunctionalInterface
@@ -56,8 +58,8 @@ public final class ParticleDirector {
 		 * @param quadScale multiplier on the vanilla quad after construction; {@code 1} leaves default size
 		 */
 		void spawn(
-			Level level,
-			ParticleOptions particle,
+			World world,
+			ParticleEffect particle,
 			double x,
 			double y,
 			double z,
@@ -73,12 +75,12 @@ public final class ParticleDirector {
 	 *
 	 * @param origin world contact point from the hit result
 	 * @param motion dagger delta-movement at impact (pre-stick)
-	 * @param state block that was hit; used to build {@code BlockParticleOption}
+	 * @param state block that was hit; used to build {@code BlockStateParticleEffect}
 	 * @param face struck face; crumbs bias along its outward normal
 	 */
 	public record HitContext(
-		Vec3 origin,
-		Vec3 motion,
+		Vec3d origin,
+		Vec3d motion,
 		BlockState state,
 		Direction face
 	) {
@@ -100,7 +102,7 @@ public final class ParticleDirector {
 	 * @param dagger source projectile
 	 */
 	public static void tick(DaggerEntity dagger) {
-		if (!dagger.level().isClientSide()) {
+		if (!dagger.getWorld().isClient) {
 			return;
 		}
 
@@ -109,9 +111,9 @@ public final class ParticleDirector {
 			return;
 		}
 
-		Vec3 end = dagger.position();
-		Vec3 motion = dagger.getDeltaMovement();
-		Vec3 start = end.subtract(motion);
+		Vec3d end = dagger.getPos();
+		Vec3d motion = dagger.getVelocity();
+		Vec3d start = end.subtract(motion);
 
 		for (ParticlePresets.Preset preset : presets) {
 			for (ParticleSpawnSpec spec : preset.specs()) {
@@ -127,12 +129,12 @@ public final class ParticleDirector {
 	 * @param hit pre-stick contact snapshot
 	 */
 	public static void hitBlock(DaggerEntity dagger, HitContext hit) {
-		if (!dagger.level().isClientSide()) {
+		if (!dagger.getWorld().isClient) {
 			return;
 		}
 
 		BlockState state = hit.state();
-		if (state.isAir() || !state.shouldSpawnTerrainParticles()) {
+		if (state.isAir()) {
 			return;
 		}
 
@@ -141,7 +143,7 @@ public final class ParticleDirector {
 			return;
 		}
 
-		ParticleOptions particle = new BlockParticleOption(ParticleTypes.BLOCK, state);
+		ParticleEffect particle = new BlockStateParticleEffect(ParticleTypes.BLOCK, state);
 		for (ParticlePresets.Preset preset : presets) {
 			for (ParticleSpawnSpec spec : preset.specs()) {
 				if (spec.placement() == ParticleSpawnSpec.Placement.IMPACT_RADIAL) {
@@ -151,12 +153,12 @@ public final class ParticleDirector {
 		}
 	}
 
-	private static void emitTrailSpec(DaggerEntity dagger, ParticleSpawnSpec spec, Vec3 start, Vec3 motion) {
+	private static void emitTrailSpec(DaggerEntity dagger, ParticleSpawnSpec spec, Vec3d start, Vec3d motion) {
 		if (!shouldEmit(dagger, spec)) {
 			return;
 		}
 		int period = Math.max(1, spec.periodTicks());
-		if (dagger.tickCount % period != 0) {
+		if (dagger.age % period != 0) {
 			return;
 		}
 		if (spec.placement() != ParticleSpawnSpec.Placement.MOTION_SUBSTEPS) {
@@ -166,15 +168,15 @@ public final class ParticleDirector {
 			return;
 		}
 
-		float charge = Mth.clamp(dagger.getThrowCharge(), 0.0F, 1.0F);
+		float charge = MathHelper.clamp(dagger.getThrowCharge(), 0.0F, 1.0F);
 		int substepsMin = Math.max(1, spec.substepsMin());
 		int substepsMax = Math.max(substepsMin, spec.substeps());
 		// Charge 0 uses the spec mins; charge 1 uses the spec maxes (full throw).
-		int substeps = Math.max(1, Math.round(Mth.lerp(charge, (float) substepsMin, (float) substepsMax)));
-		float quadScale = Mth.lerp(charge, spec.quadScaleMin(), spec.quadScale());
-		Vec3 aux = spec.velocityMode().auxVelocity(motion);
-		RandomSource random = dagger.getRandom();
-		Level level = dagger.level();
+		int substeps = Math.max(1, Math.round(MathHelper.lerp(charge, (float) substepsMin, (float) substepsMax)));
+		float quadScale = MathHelper.lerp(charge, spec.quadScaleMin(), spec.quadScale());
+		Vec3d aux = spec.velocityMode().auxVelocity(motion);
+		Random random = dagger.getRandom();
+		World world = dagger.getWorld();
 		double offset = spec.offsetRadius();
 		float chance = spec.spawnChance();
 
@@ -192,7 +194,7 @@ public final class ParticleDirector {
 				y += (random.nextDouble() - 0.5) * 2.0 * offset;
 				z += (random.nextDouble() - 0.5) * 2.0 * offset;
 			}
-			SPAWNER.spawn(level, spec.particle(), x, y, z, aux.x, aux.y, aux.z, quadScale);
+			SPAWNER.spawn(world, spec.particle(), x, y, z, aux.x, aux.y, aux.z, quadScale);
 		}
 	}
 
@@ -203,7 +205,7 @@ public final class ParticleDirector {
 		DaggerEntity dagger,
 		ParticleSpawnSpec spec,
 		HitContext hit,
-		ParticleOptions particle
+		ParticleEffect particle
 	) {
 		ParticleSpawnSpec.RadialBurst burst = spec.burst();
 		if (burst == null) {
@@ -213,34 +215,34 @@ public final class ParticleDirector {
 		float speed = (float) hit.motion().length();
 		int countMin = Math.max(1, burst.countMin());
 		int countMax = Math.max(countMin, burst.countMax());
-		int count = Mth.clamp(
+		int count = MathHelper.clamp(
 			Math.round(countMin + burst.countPerSpeed() * speed),
 			countMin,
 			countMax
 		);
 		float kick = Math.min(burst.kickMax(), burst.kickMin() + burst.kickPerSpeed() * speed);
 
-		Vec3 motion = hit.motion();
-		Vec3 normal = hit.face().getUnitVec3();
-		Vec3 origin = hit.origin().add(normal.scale(SURFACE_NUDGE));
-		if (motion.lengthSqr() > 1.0E-8 && burst.spawnBehind() > 0.0) {
-			origin = origin.subtract(motion.normalize().scale(burst.spawnBehind()));
+		Vec3d motion = hit.motion();
+		Vec3d normal = new Vec3d(hit.face().getOffsetX(), hit.face().getOffsetY(), hit.face().getOffsetZ());
+		Vec3d origin = hit.origin().add(normal.multiply(SURFACE_NUDGE));
+		if (motion.lengthSquared() > 1.0E-8 && burst.spawnBehind() > 0.0) {
+			origin = origin.subtract(motion.normalize().multiply(burst.spawnBehind()));
 		}
-		Vec3 inherited = motion.scale(burst.motionInherit());
-		RandomSource random = dagger.getRandom();
-		Level level = dagger.level();
+		Vec3d inherited = motion.multiply(burst.motionInherit());
+		Random random = dagger.getRandom();
+		World world = dagger.getWorld();
 		double offset = spec.offsetRadius();
 		float quadScale = spec.quadScale();
 
 		for (int i = 0; i < count; i++) {
-			Vec3 dir = randomUnit(random);
-			dir = dir.add(normal.scale(FACE_BIAS));
-			if (dir.lengthSqr() < 1.0E-8) {
+			Vec3d dir = randomUnit(random);
+			dir = dir.add(normal.multiply(FACE_BIAS));
+			if (dir.lengthSquared() < 1.0E-8) {
 				dir = normal;
 			} else {
 				dir = dir.normalize();
 			}
-			Vec3 aux = dir.scale(kick).add(inherited);
+			Vec3d aux = dir.multiply(kick).add(inherited);
 
 			double x = origin.x;
 			double y = origin.y;
@@ -250,17 +252,17 @@ public final class ParticleDirector {
 				y += (random.nextDouble() - 0.5) * 2.0 * offset;
 				z += (random.nextDouble() - 0.5) * 2.0 * offset;
 			}
-			SPAWNER.spawn(level, particle, x, y, z, aux.x, aux.y, aux.z, quadScale);
+			SPAWNER.spawn(world, particle, x, y, z, aux.x, aux.y, aux.z, quadScale);
 		}
 	}
 
 	/**
 	 * Gaussian sample on the sphere; falls back to +Y if the vector collapses.
 	 */
-	private static Vec3 randomUnit(RandomSource random) {
-		Vec3 dir = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
-		if (dir.lengthSqr() < 1.0E-8) {
-			return new Vec3(0.0, 1.0, 0.0);
+	private static Vec3d randomUnit(Random random) {
+		Vec3d dir = new Vec3d(random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
+		if (dir.lengthSquared() < 1.0E-8) {
+			return new Vec3d(0.0, 1.0, 0.0);
 		}
 		return dir.normalize();
 	}
@@ -269,13 +271,13 @@ public final class ParticleDirector {
 	 * Ground and water win over air/return so stuck or submerged daggers do not keep drawing a flight line.
 	 */
 	private static boolean shouldEmit(DaggerEntity dagger, ParticleSpawnSpec spec) {
-		if (dagger.isInGround()) {
+		if (dagger.isStuckInGround()) {
 			return spec.emitInGround();
 		}
-		if (dagger.isInWater()) {
+		if (dagger.isTouchingWater()) {
 			return spec.emitInWater();
 		}
-		if (dagger.returnTimer > 0 || dagger.isNoPhysics()) {
+		if (dagger.returnTimer > 0 || dagger.isNoClip()) {
 			return spec.emitReturning();
 		}
 		return spec.emitInAir();

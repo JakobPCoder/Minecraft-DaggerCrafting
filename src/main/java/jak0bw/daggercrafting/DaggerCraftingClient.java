@@ -4,12 +4,12 @@ import jak0bw.daggercrafting.entity.DaggerEntityRenderer;
 import jak0bw.daggercrafting.particle.ParticleDirector;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.minecraft.client.Minecraft;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class DaggerCraftingClient implements ClientModInitializer {
 		ParticleDirector.setSpawner(DaggerCraftingClient::spawnScaledParticle);
 		LOGGER.info("Registering dagger entity renderers");
 		for (String name : DaggerToolMaterial.DAGGER_TOOL_MATERIALS.keySet()) {
-			EntityRenderers.register(ModEntities.DAGGER_ENTITY_TYPES.get(name), DaggerEntityRenderer::new);
+			EntityRendererRegistry.register(ModEntities.DAGGER_ENTITY_TYPES.get(name), DaggerEntityRenderer::new);
 		}
 
 		LOGGER.info("DaggerCrafting client initialized");
@@ -43,13 +43,13 @@ public class DaggerCraftingClient implements ClientModInitializer {
 	/**
 	 * Client spawn that keeps vanilla particle types (crit, flame, smoke) but can shrink their quads.
 	 *
-	 * {@link ParticleEngine#createParticle} already inserts the instance; {@link Particle#scale} then
-	 * multiplies {@code quadSize} on {@code SingleQuadParticle} before the first render.
-	 * {@code level} is unused because the engine is a client singleton, not per-world.
+	 * {@link ParticleManager#addParticle} already inserts the instance; {@link Particle#scale} then
+	 * multiplies {@code quadSize} on {@code BillboardParticle} before the first render.
+	 * {@code world} is unused because the engine is a client singleton, not per-world.
 	 */
 	private static void spawnScaledParticle(
-		Level level,
-		ParticleOptions particle,
+		World world,
+		ParticleEffect particle,
 		double x,
 		double y,
 		double z,
@@ -58,8 +58,8 @@ public class DaggerCraftingClient implements ClientModInitializer {
 		double zd,
 		float quadScale
 	) {
-		ParticleEngine engine = Minecraft.getInstance().particleEngine;
-		Particle spawned = engine.createParticle(particle, x, y, z, xd, yd, zd);
+		ParticleManager engine = MinecraftClient.getInstance().particleManager;
+		Particle spawned = engine.addParticle(particle, x, y, z, xd, yd, zd);
 		if (spawned != null && quadScale != 1.0f) {
 			spawned.scale(quadScale);
 		}

@@ -4,8 +4,8 @@ import java.util.List;
 
 import jak0bw.daggercrafting.DaggerCrafting;
 
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.Identifier;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.Identifier;
 
 /**
  * Java-side catalog of trail and block-impact presets.
@@ -159,6 +159,6 @@ public final class ParticlePresets {
 	}
 
 	private static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(DaggerCrafting.MOD_ID, path);
+		return Identifier.of(DaggerCrafting.MOD_ID, path);
 	}
 }

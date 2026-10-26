@@ -1,8 +1,8 @@
 package jak0bw.daggercrafting.particle;
 
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Immutable spawn recipe for one particle layer: what to spawn, how densely, and under which flight states.
@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
  * controls spawn sampling so presets can share {@link ParticleDirector} without duplicating loops.
  *
  * @param particle vanilla options for trails; {@code null} when {@link Placement#IMPACT_RADIAL}
- *     fills {@code BlockParticleOption} from the hit block
+ *     fills {@code BlockStateParticleEffect} from the hit block
  * @param placement trail substeps or a one-shot radial burst
  * @param substepsMin motion samples at throw charge {@code 0}
  * @param substeps samples at throw charge {@code 1} (vanilla crit arrows use 4)
@@ -21,14 +21,14 @@ import org.jspecify.annotations.Nullable;
  * @param emitInAir outbound flight while not in water or ground
  * @param emitReturning loyalty homing ({@code returnTimer > 0} or no-physics)
  * @param emitInGround stuck in a block
- * @param emitInWater moving through water (vanilla already draws bubbles via {@code AbstractArrow})
+ * @param emitInWater moving through water (vanilla already draws bubbles via {@code PersistentProjectileEntity})
  * @param spawnChance per-sample probability in {@code [0, 1]}
  * @param quadScaleMin client quad multiplier at throw charge {@code 0}
  * @param quadScale client quad multiplier at throw charge {@code 1}, or impact crumb size
  * @param burst speed-scaled count/kick for {@link Placement#IMPACT_RADIAL}; {@code null} on trails
  */
 public record ParticleSpawnSpec(
-	@Nullable ParticleOptions particle,
+	@Nullable ParticleEffect particle,
 	Placement placement,
 	int substepsMin,
 	int substeps,
@@ -105,14 +105,14 @@ public record ParticleSpawnSpec(
 
 		/**
 		 * @param motion dagger delta-movement for the segment being sampled
-		 * @return aux velocity passed to {@link net.minecraft.world.level.Level#addParticle}
+		 * @return aux velocity passed to {@link net.minecraft.world.World#addParticle}
 		 */
-		public Vec3 auxVelocity(Vec3 motion) {
+		public Vec3d auxVelocity(Vec3d motion) {
 			return switch (this) {
-				case ZERO -> Vec3.ZERO;
-				case OPPOSE_MOTION -> new Vec3(-motion.x, -motion.y + OPPOSE_Y_BOOST, -motion.z);
-				case UPWARD_BIAS -> new Vec3(0.0, UPWARD_SPEED, 0.0);
-				case SLOW_RISE -> new Vec3(0.0, SLOW_RISE_SPEED, 0.0);
+				case ZERO -> Vec3d.ZERO;
+				case OPPOSE_MOTION -> new Vec3d(-motion.x, -motion.y + OPPOSE_Y_BOOST, -motion.z);
+				case UPWARD_BIAS -> new Vec3d(0.0, UPWARD_SPEED, 0.0);
+				case SLOW_RISE -> new Vec3d(0.0, SLOW_RISE_SPEED, 0.0);
 			};
 		}
 	}
@@ -158,7 +158,7 @@ public record ParticleSpawnSpec(
 	 * @param quadScale size at full charge
 	 */
 	public static ParticleSpawnSpec airTrail(
-		ParticleOptions particle,
+		ParticleEffect particle,
 		int substepsMin,
 		int substeps,
 		double offsetRadius,
@@ -192,7 +192,7 @@ public record ParticleSpawnSpec(
 	 * @param quadScale visual size vs vanilla default
 	 */
 	public static ParticleSpawnSpec airTrailPeriodic(
-		ParticleOptions particle,
+		ParticleEffect particle,
 		int substepsMin,
 		int substeps,
 		int periodTicks,
@@ -239,7 +239,7 @@ public record ParticleSpawnSpec(
 	 * @param quadScale client size vs vanilla default
 	 */
 	public static ParticleSpawnSpec groundWisp(
-		ParticleOptions particle,
+		ParticleEffect particle,
 		int periodTicks,
 		double offsetRadius,
 		VelocityMode velocityMode,
