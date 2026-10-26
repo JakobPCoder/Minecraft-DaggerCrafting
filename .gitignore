@@ -48,3 +48,26 @@ replay_*.log
 .cursor/mc-*-src/
 .cursor/plans/
 cf_page.html
+
+# Local AI notes and caches (not needed to build or ship the mod)
+
+GEMINI.md
+CLAUDE.md
+AGENTS.md
+.gemini/
+.claude/
+.agents/
+.codex/
+.windsurf/
+.aider*
+.continue/
+
+# Extra local runtime junk
+
+crash-reports/
+logs/
+*.tmp
+*.bak
+*~
+Thumbs.db
+desktop.ini
