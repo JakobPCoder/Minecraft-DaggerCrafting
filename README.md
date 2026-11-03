@@ -16,7 +16,9 @@ DaggerCrafting transcends traditional weapon types, offering a unique blended co
 
 Daggers are crafted using a stick and a piece of the corresponding material, placed diagonally in a crafting grid.
 
-![Items](images/items.png)![Items](images/iron.png)![Items](images/netherite.png)
+Netherite Daggers are obtained just like other netherite items.
+
+![Daggers](images/items.png)![Iron dagger](images/iron.png)![Netherite dagger](images/netherite.png)
 
 ## Ranged Combat
 
@@ -32,29 +34,7 @@ When in the main hand, the dagger will work just like a sword, but with less dam
 
 ## Enchantments
 
-Daggers support the following vanilla enchantments:
-
-### Vanilla
-
-*   **Loyalty** (Levels I-III)
-    *   Unlike vanilla tridents, a dagger's Loyalty enchantment scales directly with its material's base throwing velocity! High-tier daggers, like Diamond, return significantly faster, enabling quicker follow-up throws and a fluid ranged combat experience. Essential for viability as a ranged weapon.
-*   **Fire Aspect** (Levels I-II)
-    *   Works just like in vanilla. Sets the target on fire on melee attacks: **I** for 4 seconds, **II** for 8 seconds.
-*   **Flame** (Level I)
-    *   Sets the thrown dagger on fire for 5 seconds. On a hit, the target is set on fire for 4 seconds, which is shorter than vanilla arrows (5 seconds). Ranged attacks only.
-*   **Unbreaking** (Levels I-III)
-    *   Works just like in vanilla. Each point of durability lost has a chance to be ignored: **I** 50%, **II** 67%, **III** 75%. A dagger lasts **2x**, **3x** or **4x** as long. See the durability table below.
-
-_These enchantments work just like in vanilla. Their modifiers are applied on **melee and ranged attacks**._ All listed vanilla enchantments, except Mending, can be obtained through an enchanting table. Mending can be applied via an anvil.
-
-*   **Sharpness** (Levels I-V)
-    *   Works just like in vanilla. Increases the damage dealt on melee and ranged hits.
-*   **Smite** (Levels I-V)
-    *   Works just like in vanilla. Increases the damage dealt to undead mobs on melee and ranged hits.
-*   **Bane of Arthropods** (Levels I-V)
-    *   Works just like in vanilla. Increases the damage dealt to arthropod mobs (like spiders and silverfish) on melee and ranged hits, and slows them down.
-*   **Mending** (Level I)
-    *   Works just like in vanilla. Repairs the dagger using experience. Obtained via an anvil.
+Daggers support the following enchantments:
 
 ### Custom enchantments
 
@@ -65,8 +45,24 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 *   **Restitution** (Level I)
     *   On a thrown hit against an entity, including a fully blocked hit, the dagger is put back in the thrower's inventory immediately. Misses and block-only landings do not return. Cannot be combined with Loyalty.
 
-## Stats
+### Vanilla
 
+*   **Loyalty** (Levels I-III)
+    *   Unlike vanilla tridents, a dagger's Loyalty enchantment scales directly with its material's base throwing velocity! High-tier daggers, like Diamond, return significantly faster, enabling quicker follow-up throws and a fluid ranged combat experience. Essential for viability as a ranged weapon.
+*   **Fire Aspect** (Levels I-II)
+    *   Works just like in vanilla. Sets the target on fire on melee attacks: **I** for 4 seconds, **II** for 8 seconds.
+*   **Flame** (Level I)
+    *   Sets the thrown dagger on fire for 5 seconds. On a hit, the target is set on fire for 4 seconds, which is shorter than vanilla arrows (5 seconds). Ranged attacks only.
+
+_These enchantments work just like in vanilla. Their modifiers are applied on **melee and ranged attacks**._ All of them except Mending can be obtained through an enchanting table. Mending can be applied via an anvil.
+
+*   **Unbreaking** (Levels I-III)
+*   **Sharpness** (Levels I-V)
+*   **Smite** (Levels I-V)
+*   **Bane of Arthropods** (Levels I-V)
+*   **Mending** (Level I)
+
+## Stats
 
 | **Material** | **Ranged Damage** | **Ranged Velocity** | **Durability** | **Melee Damage** | **Enchantability** |
 | -------- |------------- |--------------- |---------- |------------- |-------------- |
@@ -78,15 +74,4 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 | Diamond |8 |**2.0** |250 |5 |10 |
 | Netherite |9 |**2.0** |500 |6 |15 |
 
-### Durability with Unbreaking
-
-| **Material** | **Base** | **Unbreaking I** | **Unbreaking II** | **Unbreaking III** |
-| -------- |------------- |--------------- |---------- |------------- |
-| Golden |20 |40 |60 |80 |
-| Wooden |30 |60 |90 |120 |
-| Stone |50 |100 |150 |200 |
-| Copper |70 |140 |210 |280 |
-| Iron |100 |200 |300 |400 |
-| Diamond |250 |500 |750 |1000 |
-| Netherite |500 |1000 |1500 |2000 |
 ---
