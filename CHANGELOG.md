@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0]
+
+### Added
+- Daggers mine cobwebs, leaves, and bamboo at the same speeds as swords.
+
+### Fixed
+- Mending now repairs from XP orbs while the dagger is in the main hand or offhand, matching swords. Still anvil/treasure only; inventory and thrown daggers do not mend.
+
 ## [1.4.0]
 
 ### Added

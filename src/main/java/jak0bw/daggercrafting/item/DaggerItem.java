@@ -5,18 +5,24 @@ import jak0bw.daggercrafting.DaggerToolMaterial;
 import jak0bw.daggercrafting.ModEnchantments;
 import jak0bw.daggercrafting.entity.DaggerEntity;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Position;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,12 +41,13 @@ import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.BlockPos;
 
 /**
  * Throwable melee weapon: one registered instance per {@link DaggerToolMaterial} tier in {@link jak0bw.daggercrafting.ModItems}.
@@ -53,6 +60,10 @@ import net.minecraft.core.BlockPos;
  * Implements {@link ProjectileItem} for dispensers. Enchantments such as loyalty and
  * {@link ModEnchantments#THROWING_SPEED} are allowed on daggers via
  * {@link jak0bw.daggercrafting.mixin.EnchantmentMixin} and read in entity / throw code paths.
+ *
+ * Mending can be applied at an anvil (not the enchanting table). XP orbs repair it only while the
+ * stack is in the main hand or offhand, same as a sword; a dagger in the backpack or currently
+ * thrown as a {@link DaggerEntity} is not equipped and does not consume XP.
  */
 public class DaggerItem extends Item implements ProjectileItem {
 
@@ -78,11 +89,18 @@ public class DaggerItem extends Item implements ProjectileItem {
 	private final DaggerToolMaterial material;
 
 	/**
-	 * Central place to attach durability, repair tag, enchantability, and melee attributes for every tier.
+	 * Central place to attach durability, repair tag, enchantability, sword-like mining, and melee
+	 * attributes for every tier.
 	 *
 	 * {@link jak0bw.daggercrafting.ModItems} passes per-material attack damage; attack speed is shared
 	 * via {@link #ATTACK_SPEED}. Ranged stats are not item attributes—they live on {@link DaggerToolMaterial}
 	 * and are applied when building {@link DaggerEntity}.
+	 *
+	 * Mining copies vanilla {@code ToolMaterial.applySwordProperties} {@link DataComponents#TOOL} rules
+	 * (cobweb, {@link BlockTags#SWORD_INSTANTLY_MINES}, {@link BlockTags#SWORD_EFFICIENT}). Daggers are
+	 * not added to {@code #minecraft:swords}; that item tag would leak Sweeping Edge and other sword-only
+	 * enchantments. {@link DaggerToolMaterial#getMiningSpeed()} is unused here so every tier matches
+	 * sword speeds rather than pickaxe-style tier scaling.
 	 *
 	 * @param properties base registry properties from mod item registration
 	 * @param material tier stats source
@@ -100,6 +118,7 @@ public class DaggerItem extends Item implements ProjectileItem {
 			.durability(material.getDurability())
 			.repairable(material.getRepairIngredientTag())
 			.enchantable(material.getEnchantability())
+			.component(DataComponents.TOOL, swordLikeMiningTool())
 			.attributes(
 				ItemAttributeModifiers.builder()
 					.add(
@@ -114,6 +133,29 @@ public class DaggerItem extends Item implements ProjectileItem {
 					)
 					.build()
 			);
+	}
+
+	/**
+	 * Sword-parity {@link DataComponents#TOOL} used by every dagger tier.
+	 *
+	 * Vanilla swords attach this during bootstrap via {@code BuiltInRegistries.acquireBootstrapRegistrationLookup}.
+	 * Fabric item registration runs after the block registry is frozen, so this uses the live named
+	 * {@link HolderSet}s already created for those tags (vanilla swords bind them at bootstrap).
+	 *
+	 * @return cobweb at speed 15 with drops, instant bamboo, 1.5× sword-efficient plants, default 1.0,
+	 *     2 durability per mined block, no creative block break
+	 */
+	private static Tool swordLikeMiningTool() {
+		return new Tool(
+			List.of(
+				Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0F),
+				Tool.Rule.overrideSpeed(BuiltInRegistries.BLOCK.getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE),
+				Tool.Rule.overrideSpeed(BuiltInRegistries.BLOCK.getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
+			),
+			1.0F,
+			2,
+			false
+		);
 	}
 
 	/**
@@ -151,6 +193,9 @@ public class DaggerItem extends Item implements ProjectileItem {
 
 	/**
 	 * Creative instabuild players still swing; this only blocks breaking blocks while using the dagger as a tool.
+	 *
+	 * Matches {@code canDestroyBlocksInCreative: false} on {@link #swordLikeMiningTool()} so the
+	 * {@link DataComponents#TOOL} component and this override stay in agreement with swords.
 	 */
 	@Override
 	public boolean canDestroyBlock(ItemStack itemStack, BlockState state, Level level, BlockPos pos, LivingEntity user) {

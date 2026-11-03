@@ -32,6 +32,8 @@ When holding and releasing the right mouse button, the dagger will be thrown, si
 
 When in the main hand, the dagger will work just like a sword, but with less damage and a faster attack speed.
 
+Daggers also break cobwebs, leaves, and bamboo like swords.
+
 ## Enchantments
 
 Daggers support the following enchantments:
@@ -61,6 +63,7 @@ _These enchantments work just like in vanilla. Their modifiers are applied on **
 *   **Smite** (Levels I-V)
 *   **Bane of Arthropods** (Levels I-V)
 *   **Mending** (Level I)
+    *   XP orbs repair the dagger only while it is in the main hand or offhand, same as a sword. A dagger in the inventory or currently thrown does not mend.
 
 ## Stats
 
