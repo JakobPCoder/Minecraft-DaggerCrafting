@@ -1,6 +1,6 @@
 # DaggerCrafting porting reference: Minecraft / Fabric 26.2 → 26.3
 
-Short lookup for bumping **this** repo from **Minecraft 26.2** (Chaos Cubed) to **26.3** (Wilderness Bound). For the full 1.21.5 → 26.2 history, see [PORTING_1.21.5_TO_26.2.md](./PORTING_1.21.5_TO_26.2.md). For which Git branch to use (`base/26.2`, `base/26.3`, `feature/*`), see [BRANCHING_WORKFLOW.md](./BRANCHING_WORKFLOW.md).
+Short lookup for bumping **this** repo from **Minecraft 26.2** (Chaos Cubed) to **26.3** (Wilderness Bound). For the full 1.21.5 → 26.2 history, see [PORTING_1.21.5_TO_26.2.md](./PORTING_1.21.5_TO_26.2.md). For which Git branch to use (`26.2-<mod>`, `26.3-<mod>`, `26.3-<mod>-<feature>`), see [BRANCHING_WORKFLOW.md](./BRANCHING_WORKFLOW.md).
 
 26.3 is a large vanilla drop (worldgen, registries, rendering stack, SDL input). Most of that does **not** touch thrown daggers. This file filters to what `src/main/java` and our datapack actually use.
 
