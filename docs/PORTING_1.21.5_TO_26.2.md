@@ -543,6 +543,7 @@ Highest Java complexity after the entity.
 - Re-apply charge curve, throwing_speed lookup via `Holder<Enchantment>`, inventory consume, tooltip.
 - Replace every Yarn type in the import list (section 1.3).
 - Tooltip: verify `appendTooltip` still exists; else component appender.
+- Sword-like `DataComponents.TOOL` tag rules at Fabric `onInitialize` must use `BuiltInRegistries.acquireBootstrapRegistrationLookup`, not live `BuiltInRegistries.BLOCK.getOrThrow(TagKey)`. Public tags are still unbound then; the live getter crashes datagen and client boot.
 
 ### 5.6 `ModEntities.java`
 

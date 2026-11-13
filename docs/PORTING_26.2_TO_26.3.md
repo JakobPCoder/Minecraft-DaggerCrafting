@@ -85,7 +85,7 @@ Low-level types (`SubmitNodeCollector`, `ItemModelResolver`, `CameraRenderState`
 
 | File | 26.3 expectation |
 | --- | --- |
-| `item/DaggerItem.java` | Re-copy patterns from **`TridentItem`** if `use` / `releaseUsing` / `ProjectileItem` changed. Watch **`LivingEntity#swing`** if you add arm swing with `SwingAnimation` (not used today). |
+| `item/DaggerItem.java` | Re-copy patterns from **`TridentItem`** if `use` / `releaseUsing` / `ProjectileItem` changed. Watch **`LivingEntity#swing`** if you add arm swing with `SwingAnimation` (not used today). Item `TOOL` rules that mention block tags must use `BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)` at Fabric `main` init; `BuiltInRegistries.BLOCK.getOrThrow(TagKey)` throws `Tags not bound` (datagen and client). |
 | `mixin/EnchantmentMixin.java` | Re-check `@Inject` targets on **`Enchantment`** after compile; vanilla enchantment Java changed around registry holders but our mixin is `isAcceptableItem` / `isPrimaryItem`. |
 | `ModItems`, `ModEntities`, `ModEnchantments`, `DaggerToolMaterial`, clients | Usually version bump only. |
 | `DaggerCraftingDataGenerator` | Empty stub — ignore until you generate data; 26.3 datagen for reloadable registries is a different beast (loot/advancements/recipes as registries). |

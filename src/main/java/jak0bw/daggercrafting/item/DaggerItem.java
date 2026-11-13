@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Position;
 import net.minecraft.core.component.DataComponents;
@@ -46,6 +47,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -138,19 +140,22 @@ public class DaggerItem extends Item implements ProjectileItem {
 	/**
 	 * Sword-parity {@link DataComponents#TOOL} used by every dagger tier.
 	 *
-	 * Vanilla swords attach this during bootstrap via {@code BuiltInRegistries.acquireBootstrapRegistrationLookup}.
-	 * Fabric item registration runs after the block registry is frozen, so this uses the live named
-	 * {@link HolderSet}s already created for those tags (vanilla swords bind them at bootstrap).
+	 * Fabric {@code main} and {@code runDatagen} still see unbound public block tags at
+	 * {@code ModItems} construction, so {@code BuiltInRegistries.BLOCK.getOrThrow(TagKey)} throws
+	 * {@code Tags not bound}. Vanilla swords avoid that with
+	 * {@code BuiltInRegistries.acquireBootstrapRegistrationLookup}, which creates tag holders for
+	 * registration without requiring {@code allTags} to be bound.
 	 *
 	 * @return cobweb at speed 15 with drops, instant bamboo, 1.5× sword-efficient plants, default 1.0,
 	 *     2 durability per mined block, no creative block break
 	 */
 	private static Tool swordLikeMiningTool() {
+		HolderGetter<Block> blocks = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
 		return new Tool(
 			List.of(
 				Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0F),
-				Tool.Rule.overrideSpeed(BuiltInRegistries.BLOCK.getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE),
-				Tool.Rule.overrideSpeed(BuiltInRegistries.BLOCK.getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
+				Tool.Rule.overrideSpeed(blocks.getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE),
+				Tool.Rule.overrideSpeed(blocks.getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
 			),
 			1.0F,
 			2,

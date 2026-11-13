@@ -7,6 +7,7 @@
 
 ### Fixed
 - Mending now repairs from XP orbs while the dagger is in the main hand or offhand, matching swords. Still anvil/treasure only; inventory and thrown daggers do not mend.
+- Client and datagen no longer crash while registering daggers: sword mining tags (`sword_instantly_mines`, `sword_efficient`) are resolved with vanilla’s bootstrap registry lookup instead of the unbound live tag set.
 
 ## [1.4.0]
 
