@@ -30,7 +30,16 @@ When holding and releasing the right mouse button, the dagger will be thrown, si
 
 ## Melee Combat
 
-When in the main hand, the dagger will work just like a sword, but with less damage and a faster attack speed.
+When in the main hand, the dagger will work just like a sword, but with less damage, a faster attack speed, and a slightly shorter reach.
+
+A dagger is a close-quarters weapon, so it keeps sword mining parity but swings at 80% of the distance a sword does:
+
+| | Swing reach (survival) | Swing reach (creative) |
+| --- | --- | --- |
+| Sword and other vanilla weapons | 3.0 blocks | 5.0 blocks |
+| Dagger | 2.4 blocks (80%) | 4.0 blocks (80%) |
+
+Only the distance at which a swing connects is shorter. Block breaking and entity interaction distance are unchanged, so chests, levers, trading and mounts behave exactly as they do with a sword.
 
 Daggers also break cobwebs, leaves, and bamboo like swords.
 

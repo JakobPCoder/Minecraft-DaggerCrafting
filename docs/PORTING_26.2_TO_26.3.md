@@ -124,7 +124,8 @@ Gameplay note (not a port task): 26.3 changes sun-burn protection enchant behavi
 3. **`DaggerEntity.java`** — `hurtMarked` → `syncVelocity` (or vanilla equivalent).
 4. **`DaggerEntityRenderer.java`** — `mulPose` → `rotate`.
 5. **Compile** — `gradlew.bat compileJava`; fix any new `TridentItem` / `AbstractArrow` / `Enchantment` diffs.
-6. **Manual test** — creative combat tab, throw + pickup + loyalty return, `throwing_speed` levels, melee hit, enchant mixin (daggers in table).
+6. **`DaggerItem.java`** — confirm `DataComponents.ATTACK_RANGE` (from `DAGGER_ATTACK_RANGE`) still compiles and the constant still derives from the `Player` reach defaults; the component signature and `AttackRange` field order are the things most likely to shift. See `docs/ATTACK_RANGE.md`.
+7. **Manual test** — creative combat tab, throw + pickup + loyalty return, `throwing_speed` levels, melee hit, enchant mixin (daggers in table), and the dagger reach boundary (2.3 connects / 2.5 does not).
 
 ---
 

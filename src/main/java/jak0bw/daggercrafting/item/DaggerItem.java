@@ -41,6 +41,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.AttackRange;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -58,6 +59,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * {@link DaggerEntity} whose damage and speed come from the material, not from duplicate stats on the item NBT.
  * Melee uses standard item attributes from {@link #applyDaggerSettings}; ranged uses
  * {@link DaggerToolMaterial#getRangedDamage()} / {@link DaggerToolMaterial#getRangedVelocity()} on the entity.
+ * Melee attack reach is shared by all tiers and shorter than a sword's, see {@link #DAGGER_ATTACK_RANGE}.
  *
  * Implements {@link ProjectileItem} for dispensers. Enchantments such as loyalty and
  * {@link ModEnchantments#THROWING_SPEED} are allowed on daggers via
@@ -71,6 +73,33 @@ public class DaggerItem extends Item implements ProjectileItem {
 
 	/** Shared main-hand attack speed offset for all tiers (slower than bare fist, similar to swords). */
 	private static final float ATTACK_SPEED = -2.0F;
+
+	/** Fraction of vanilla sword reach this weapon type keeps. 0.8 x 3.0 = 2.4 survival. */
+	private static final float MELEE_REACH_FACTOR = 0.8F;
+
+	/**
+	 * Shared melee reach for every dagger tier, attached as the vanilla {@code attack_range} component.
+	 *
+	 * Vanilla computes sword reach at runtime in {@code AttackRange.defaultFor}: min 0, max the
+	 * player's {@code entity_interaction_range}, margin 0, mob factor 1. Daggers keep the same shape
+	 * and shorten only the radius, so 0.8 x 3.0 = 2.4 survival and 0.8 x (3.0 + 2.0) = 4.0 creative.
+	 *
+	 * Fields that must not be copied from the spear: min reach stays 0 (the spear's 2.0 is a dead
+	 * zone that would cripple a 2.4 weapon), and the margin stays 0 exactly like the sword fallback
+	 * (the codec default 0.3 would give 2.7 effective and silently cancel this change).
+	 *
+	 * The mob factor is 0.345, not 0.8, because mob reach is a hitbox expansion rather than an eye
+	 * distance: 2.4 x 0.345 = 0.828 matches {@code Mob.DEFAULT_ATTACK_REACH}, so a mob holding a
+	 * dagger reaches like a mob holding a sword instead of gaining or losing reach.
+	 */
+	private static final AttackRange DAGGER_ATTACK_RANGE = new AttackRange(
+		0.0F,
+		Player.DEFAULT_ENTITY_INTERACTION_RANGE * MELEE_REACH_FACTOR,
+		0.0F,
+		(Player.DEFAULT_ENTITY_INTERACTION_RANGE + Player.CREATIVE_ENTITY_INTERACTION_RANGE_MODIFIER_VALUE) * MELEE_REACH_FACTOR,
+		0.0F,
+		0.345F
+	);
 
 	/** Shorter charge cancels the throw and does not consume durability or an item. */
 	private static final int MIN_THROW_TICKS = 3;
@@ -98,6 +127,10 @@ public class DaggerItem extends Item implements ProjectileItem {
 	 * via {@link #ATTACK_SPEED}. Ranged stats are not item attributes—they live on {@link DaggerToolMaterial}
 	 * and are applied when building {@link DaggerEntity}.
 	 *
+	 * Melee reach comes from {@link #DAGGER_ATTACK_RANGE} and is deliberately shorter than a sword's.
+	 * Mining reach is untouched: the {@link DataComponents#TOOL} rules below stay sword-parity, so
+	 * block breaking and entity interaction distance behave exactly as with a vanilla sword.
+	 *
 	 * Mining copies vanilla {@code ToolMaterial.applySwordProperties} {@link DataComponents#TOOL} rules
 	 * (cobweb, {@link BlockTags#SWORD_INSTANTLY_MINES}, {@link BlockTags#SWORD_EFFICIENT}). Daggers are
 	 * not added to {@code #minecraft:swords}; that item tag would leak Sweeping Edge and other sword-only
@@ -121,6 +154,8 @@ public class DaggerItem extends Item implements ProjectileItem {
 			.repairable(material.getRepairIngredientTag())
 			.enchantable(material.getEnchantability())
 			.component(DataComponents.TOOL, swordLikeMiningTool())
+			// Weapon-type reach: deliberately shorter than a sword's; see DAGGER_ATTACK_RANGE.
+			.component(DataComponents.ATTACK_RANGE, DAGGER_ATTACK_RANGE)
 			.attributes(
 				ItemAttributeModifiers.builder()
 					.add(

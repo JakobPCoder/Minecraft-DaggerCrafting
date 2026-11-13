@@ -269,7 +269,7 @@ Already covered templates in 3.4. Extra methods this repo calls:
 
 **1.21.9:** Fabric added access wideners for `EnchantmentHelper` / `Enchantment` utility methods (easier custom effect components). Not required for throwing_speed as JSON.
 
-**1.21.11:** `Enchantment#doLunge` added (spears / mounts of mayhem). Irrelevant unless you want spear enchant compatibility. New `minecraft:attack_range` component on items.
+**1.21.11:** `Enchantment#doLunge` added (spears / mounts of mayhem). Irrelevant unless you want spear enchant compatibility. New `minecraft:attack_range` component on items — this repo now uses it for the dagger's shorter melee reach (`DaggerItem.DAGGER_ATTACK_RANGE`, see `docs/ATTACK_RANGE.md`); a port must keep it.
 
 **Mixin `EnchantmentMixin` (high risk)**
 
@@ -611,7 +611,7 @@ Empty. Ignore until you generate tags/recipes. Then use 26.1 names (`FabricTagsP
 | 1.21.6 | 80 | 63 | `attribute_modifiers` entries may include `display`. Item model `oversized_in_gui`. Strict JSON. Core shader uniform blocks (only if we shipped shaders — we don’t). |
 | 1.21.7–8 | 81 | 64 | No item/enchant schema change that we use. |
 | 1.21.9–10 | 88.0 | 69.0 | **`pack.mcmeta` `min_format`/`max_format`**. Minor pack versions. OpenGL 3.3. `chain` → `iron_chain` (not our textures). |
-| 1.21.11 | 94.1 | 75.0 | **Items atlas split.** Multi-axis model rotation allowed. `attack_range` component exists (we don’t have to use it). |
+| 1.21.11 | 94.1 | 75.0 | **Items atlas split.** Multi-axis model rotation allowed. `attack_range` component exists — used by the dagger's shorter melee reach (`DaggerItem.DAGGER_ATTACK_RANGE`), not optional any more. |
 | 26.1 | 101.1 | 84.0 | Item model `transformation` on sub-models. Entity texture path reshuffle (our item textures unaffected). Trades data-driven (unused). |
 | 26.2 | 107.1 | 88.0 | Entity predicate strictness (our datapack has none). Shader merges (unused). |
 
