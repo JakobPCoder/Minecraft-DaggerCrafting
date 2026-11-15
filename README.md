@@ -61,7 +61,7 @@ Daggers support the following enchantments:
 *   **Fire Aspect** (Levels I-II)
     *   Melee only. Sets the target on fire: **I** for 4 seconds, **II** for 8 seconds.
 *   **Flame** (Level I)
-    *   Thrown attacks only. Sets the dagger on fire; a hit sets the target on fire for 4 seconds, which is shorter than a flame arrow (5 seconds).
+    *   Thrown attacks only. Sets the dagger on fire; a hit sets the target on fire for 5 seconds, the same as a flame arrow.
 *   **Unbreaking** (Levels I-III)
 *   **Sharpness** (Levels I-V)
     *   Extra damage on melee and thrown hits.

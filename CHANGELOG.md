@@ -7,6 +7,7 @@
 
 ### Changed
 - Melee reach is 80% of a sword: 2.4 blocks in survival (was 3.0) and 4.0 in creative (was 5.0). Mining distance, right-click interaction (chests, levers, trading, mounts), and throwing are unchanged.
+- Flame on thrown hits now burns the target for 5 seconds like a flame arrow, up from 4.
 
 ### Fixed
 - A melee hit now costs 1 durability and counts as a weapon use. On the 1.4.0 26.x jars the swing dealt damage and then skipped the wear, because the dagger never had the vanilla weapon component a sword uses. Thrown hits already spent durability in 1.4.0.
