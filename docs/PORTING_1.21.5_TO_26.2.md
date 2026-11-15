@@ -225,7 +225,7 @@ Packages below use **official 26.2** names in the “now” column. Yarn package
 
 **26.2:** `ItemIds` for vanilla-style registration. `ItemStackTemplate.fromStack`. `ItemStack#getDamageSource` signature simplified.
 
-`DaggerToolMaterial` is *our* class, not vanilla `ToolMaterial`. Keep it. `BlockTags.INCORRECT_FOR_*_TOOL` still exist as of 1.21.x; confirm copper: this mod’s copper dagger uses `INCORRECT_FOR_STONE_TOOL`. If 26.2 added official copper tools, there may be `INCORRECT_FOR_COPPER_TOOL` — optional improvement, not a compile requirement.
+`DaggerToolMaterial` is *our* class, not vanilla `ToolMaterial`. Keep it. From 1.5.0 it stores throw stats, melee damage, durability, and enchantability only. Mining is the shared sword `TOOL` component on `DaggerItem`, not a per-tier `INCORRECT_FOR_*` tag.
 
 ### 3.5 `ProjectileItem`, thrown spawn, trident-like use
 
@@ -269,7 +269,7 @@ Already covered templates in 3.4. Extra methods this repo calls:
 
 **1.21.9:** Fabric added access wideners for `EnchantmentHelper` / `Enchantment` utility methods (easier custom effect components). Not required for throwing_speed as JSON.
 
-**1.21.11:** `Enchantment#doLunge` added (spears / mounts of mayhem). Irrelevant unless you want spear enchant compatibility. New `minecraft:attack_range` component on items.
+**1.21.11:** `Enchantment#doLunge` added (spears / mounts of mayhem). Irrelevant unless you want spear enchant compatibility. New `minecraft:attack_range` component on items — this repo now uses it for the dagger's shorter melee reach (`DaggerItem.DAGGER_ATTACK_RANGE`, see `docs/ATTACK_RANGE.md`); a port must keep it.
 
 **Mixin `EnchantmentMixin` (high risk)**
 
@@ -524,7 +524,7 @@ Entrypoint only. No Minecraft types besides the Fabric initializer. Likely compi
 
 ### 5.3 `DaggerToolMaterial.java`
 
-Tag / identifier / `BlockTags` renames only. Confirm `INCORRECT_FOR_*` still exist.
+Identifier renames only. There is no `BlockTags` use left in this class; do not reintroduce a per-tier incorrect-block tag.
 
 ### 5.4 `ModItems.java`
 
@@ -543,6 +543,7 @@ Highest Java complexity after the entity.
 - Re-apply charge curve, throwing_speed lookup via `Holder<Enchantment>`, inventory consume, tooltip.
 - Replace every Yarn type in the import list (section 1.3).
 - Tooltip: verify `appendTooltip` still exists; else component appender.
+- Sword-like `DataComponents.TOOL` tag rules at Fabric `onInitialize` must use `BuiltInRegistries.acquireBootstrapRegistrationLookup`, not live `BuiltInRegistries.BLOCK.getOrThrow(TagKey)`. Public tags are still unbound then; the live getter crashes datagen and client boot.
 
 ### 5.6 `ModEntities.java`
 
@@ -610,7 +611,7 @@ Empty. Ignore until you generate tags/recipes. Then use 26.1 names (`FabricTagsP
 | 1.21.6 | 80 | 63 | `attribute_modifiers` entries may include `display`. Item model `oversized_in_gui`. Strict JSON. Core shader uniform blocks (only if we shipped shaders — we don’t). |
 | 1.21.7–8 | 81 | 64 | No item/enchant schema change that we use. |
 | 1.21.9–10 | 88.0 | 69.0 | **`pack.mcmeta` `min_format`/`max_format`**. Minor pack versions. OpenGL 3.3. `chain` → `iron_chain` (not our textures). |
-| 1.21.11 | 94.1 | 75.0 | **Items atlas split.** Multi-axis model rotation allowed. `attack_range` component exists (we don’t have to use it). |
+| 1.21.11 | 94.1 | 75.0 | **Items atlas split.** Multi-axis model rotation allowed. `attack_range` component exists — used by the dagger's shorter melee reach (`DaggerItem.DAGGER_ATTACK_RANGE`), not optional any more. |
 | 26.1 | 101.1 | 84.0 | Item model `transformation` on sub-models. Entity texture path reshuffle (our item textures unaffected). Trades data-driven (unused). |
 | 26.2 | 107.1 | 88.0 | Entity predicate strictness (our datapack has none). Shader merges (unused). |
 
@@ -625,6 +626,17 @@ Empty. Ignore until you generate tags/recipes. Then use 26.1 names (`FabricTagsP
 | 1.21.11 | 1.14 | 0.18.1 | Last Yarn. Start migrating mappings *before* 26.1 if you want a two-step port. |
 | 26.1 | 1.15 | 0.18.4 | **Must** switch Loom plugin id. **Must** Java 25. **Must** official names. Fabric API class rename dump (item groups, tracked data registry → `FabricEntityDataRegistry`, `FabricItem.Settings` → `Properties`, world→level event names). `fabric` mod id gone. Conventional tags v1 / loot v2 gone — unused. |
 | 26.2 | 1.17+ | 0.19.3+ | Enum extensions — unused. Tag `fabric:remove` — unused. `Gui`/`Hud` split — unused unless we set screens. |
+
+## 1.5.0 feature availability by Minecraft version
+
+| 1.5.0 change | 26.3 | 26.2 | 1.21.5 |
+| --- | --- | --- | --- |
+| Sword-parity mining (`tool` component) | yes | yes | yes |
+| Melee hit costs 1 durability | yes (`weapon` component) | yes (`weapon` component) | yes (`weapon` component; `postDamageEntity` alone never runs) |
+| 80 % sword melee reach | yes (`attack_range`) | yes (`attack_range`, since 26.x) | **no** — component exists only from 1.21.11 |
+| Flame burns 5 s on thrown hit | yes | yes | yes |
+
+On 1.21.5, `ItemStack.postHit` returns true only when `minecraft:weapon` is present, and the player attack path calls `postDamageEntity` only in that case. A dagger with only a `postDamageEntity` override therefore takes no melee durability. The 1.21.5 line attaches `WeaponComponent(1)` and removes the override, the same 1-damage result as the 26.x `weapon` component. Keeping both would charge 2.
 
 Recommended port strategy for *this* repo: **one jump** 1.21.5 Yarn → 26.2 official, using this file + 26.2 genSources + vanilla `TridentItem` / `ThrownTrident` / `ThrownItemRenderer` as templates. An intermediate 1.21.11 Yarn port would duplicate renderer `submit` work and still require a mappings migrate.
 

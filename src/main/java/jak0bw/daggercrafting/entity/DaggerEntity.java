@@ -375,7 +375,8 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		}
 
 		if (!this.level().isClientSide() && this.isOnFire() && targetEntity instanceof LivingEntity living && !living.fireImmune()) {
-			living.igniteForSeconds(4);
+			// Vanilla arrow parity: Flame burns the struck target for 5 seconds (AbstractArrow.onHitEntity).
+			living.igniteForSeconds(5.0F);
 		}
 
 		// Nearly stop forward motion so loyalty pull can take over on the next tick.

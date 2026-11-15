@@ -46,6 +46,7 @@ replay_*.log
 # cursor local scratch (decompiled Minecraft sources, browser dumps, plans)
 
 .cursor/mc-*-src/
+.cursor/tmp-vanilla/
 .cursor/plans/
 cf_page.html
 
