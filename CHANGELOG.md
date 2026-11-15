@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0]
+
+### Added
+- Sword mining. Cobwebs drop the item, bamboo breaks instantly, and `#minecraft:sword_efficient` blocks break at sword speed (1.5): leaves, vines, glow lichen, pumpkins, carved pumpkins, jack o'lanterns, melons, cocoa, big dripleaf, and chorus. Every other block stays at speed 1.0. A block that actually has hardness costs 2 durability, same as a sword; instant blocks such as bamboo do not.
+
+### Changed
+- Flame on thrown hits now burns the target for 5 seconds like a flame arrow, up from 4.
+- Melee reach is unchanged on this Minecraft version. `minecraft:attack_range` does not exist before 1.21.11, so daggers keep vanilla sword reach (3.0 survival / 5.0 creative). The 80% reach ships on the 26.x lines.
+
+### Fixed
+- Melee hits cost 1 durability via the `weapon` component, same as a sword. The old `postDamageEntity` override did not run on 1.21.5 unless that component was present, and keeping both would charge 2, so the override is gone.
+
+
 ## [1.4.0]
 
 ### Added
@@ -50,7 +63,7 @@
   - Iron dagger
   - Golden dagger
   - Diamond dagger
-- Vanilla enchantment support (Loyalty, Fire Aspect, Flame, Sharpness, Smite, Bane of Arthropods, Mending)
+- Vanilla enchantment support (Loyalty, Fire Aspect, Flame, Unbreaking, Sharpness, Smite, Bane of Arthropods; Mending from an anvil only)
 - Custom Throwing Speed enchantment (Levels I-III)
 - Velocity-based knockback system
 - Crafting recipes for all dagger variants 

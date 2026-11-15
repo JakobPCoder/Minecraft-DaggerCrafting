@@ -8,12 +8,16 @@ import jak0bw.daggercrafting.entity.DaggerEntity;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.ToolComponent;
+import net.minecraft.component.type.WeaponComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
@@ -26,8 +30,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ProjectileItem;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -59,7 +67,14 @@ public class DaggerItem extends Item implements ProjectileItem {
 	private final DaggerToolMaterial material;
 
 	/**
-	 * Central place to attach durability, repair tag, enchantability, and melee attributes for every tier.
+	 * Central place to attach durability, repair tag, enchantability, sword-like mining, weapon wear,
+	 * and melee attributes for every tier.
+	 *
+	 * {@link DataComponentTypes#WEAPON} is what makes a melee hit spend durability. {@code ItemStack.postHit}
+	 * returns true only when that component is present, so {@code PlayerEntity} never calls
+	 * {@code postDamageEntity} without it. {@code WeaponComponent(1)} matches a sword: one durability per
+	 * connecting swing. This class does not override {@code postDamageEntity}; {@code ItemStack.postDamageEntity}
+	 * already spends {@code itemDamagePerAttack}, and a second {@code damage} would charge the hit twice.
 	 */
 	public static Item.Settings applyDaggerSettings(
 		Item.Settings settings,
@@ -71,6 +86,8 @@ public class DaggerItem extends Item implements ProjectileItem {
 			.maxDamage(material.getDurability())
 			.repairable(material.getRepairIngredientTag())
 			.enchantable(material.getEnchantability())
+			.component(DataComponentTypes.TOOL, swordLikeMiningTool())
+			.component(DataComponentTypes.WEAPON, new WeaponComponent(1))
 			.attributeModifiers(
 				AttributeModifiersComponent.builder()
 					.add(
@@ -85,6 +102,31 @@ public class DaggerItem extends Item implements ProjectileItem {
 					)
 					.build()
 			);
+	}
+
+	/**
+	 * Sword-parity {@link DataComponentTypes#TOOL} used by every dagger tier.
+	 *
+	 * Fabric {@code main} and {@code runDatagen} still see unbound public block tags at
+	 * {@code ModItems} construction, so {@code Registries.BLOCK.getOrThrow(TagKey)} throws
+	 * {@code Tags not bound}. Vanilla swords avoid that with {@code Registries.createEntryLookup},
+	 * which creates tag holders for registration without requiring tags to be bound.
+	 *
+	 * @return cobweb at speed 15 with drops, instant bamboo, 1.5× sword-efficient plants, default 1.0,
+	 *     2 durability per mined block, no creative block break
+	 */
+	private static ToolComponent swordLikeMiningTool() {
+		RegistryEntryLookup<Block> blocks = Registries.createEntryLookup(Registries.BLOCK);
+		return new ToolComponent(
+			List.of(
+				ToolComponent.Rule.ofAlwaysDropping(RegistryEntryList.of(Blocks.COBWEB.getRegistryEntry()), 15.0F),
+				ToolComponent.Rule.of(blocks.getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE),
+				ToolComponent.Rule.of(blocks.getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
+			),
+			1.0F,
+			2,
+			false
+		);
 	}
 
 	public DaggerItem(Item.Settings settings, DaggerToolMaterial material) {
@@ -211,11 +253,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 		}
 		user.setCurrentHand(hand);
 		return ActionResult.CONSUME;
-	}
-
-	@Override
-	public void postDamageEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		stack.damage(1, attacker, EquipmentSlot.MAINHAND);
 	}
 
 	@Override

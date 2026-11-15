@@ -260,7 +260,8 @@ public class DaggerEntity extends PersistentProjectileEntity implements FlyingIt
 		}
 
 		if (!this.getWorld().isClient && this.isOnFire() && targetEntity instanceof LivingEntity living && !living.isFireImmune()) {
-			living.setOnFireFor(4);
+			// Vanilla arrow parity: Flame burns the struck target for 5 seconds (PersistentProjectileEntity.onEntityHit).
+			living.setOnFireFor(5.0F);
 		}
 
 		this.deflect(ProjectileDeflection.SIMPLE, targetEntity, this.getOwner(), false);

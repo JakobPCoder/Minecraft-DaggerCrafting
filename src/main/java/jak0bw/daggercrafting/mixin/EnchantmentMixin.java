@@ -21,6 +21,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * the documented dagger set even though {@link jak0bw.daggercrafting.entity.DaggerEntity} and
  * {@link DaggerItem} already consume those effects at runtime.
  *
+ * Mending is anvil-only ({@code ANVIL_IDS}, not {@code TABLE_IDS}). Once the component is on the
+ * stack, vanilla {@code ExperienceOrbEntity} XP repair runs with no extra mixin: it picks a damaged
+ * equipped item whose enchantments already have {@code EnchantmentEffectComponentTypes.REPAIR_WITH_XP}.
+ * Daggers occupy mainhand or offhand only; inventory and in-flight {@code DaggerEntity} stacks are
+ * not equipment and do not mend. Do not add daggers to {@code #minecraft:enchantable/durability} to
+ * “enable” this (that leaks Vanishing Curse).
+ *
  * Matching uses exact registry ids parsed from translation keys of the form
  * {@code enchantment.<namespace>.<path>} (for example {@code enchantment.minecraft.loyalty} →
  * {@code minecraft:loyalty}). Substring matching is avoided so a third-party id that merely contains
@@ -131,6 +138,8 @@ public class EnchantmentMixin {
 	 * Anvil (and book apply) path: {@link Enchantment#isAcceptableItem(ItemStack)}.
 	 *
 	 * Includes {@code minecraft:mending}, which is intentionally omitted from the table hook below.
+	 * After apply, XP repair is vanilla {@code ExperienceOrbEntity} on equipped slots; this method does
+	 * not implement durability restore.
 	 */
 	@Inject(method = "isAcceptableItem", at = @At("HEAD"), cancellable = true)
 	private void allowEnchantmentOnAnvil(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {

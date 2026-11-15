@@ -284,7 +284,25 @@ Editing vanilla `#exclusive_set/riptide` with `replace: false` to add your id wo
 - `minecraft:item_damage` — Unbreaking
 - `minecraft:repair_with_xp` — Mending
 
-If there is **no** vanilla component for your mechanic (dagger charge throw speed), put **no** `effects` (or omit the key) and implement in Java by looking up the `ResourceKey` and `EnchantmentHelper.getItemEnchantmentLevel`.
+### 11.1 Mending: apply vs XP repair
+
+These are **independent**. Apply does not imply the item is sitting in a slot that XP can see.
+
+| Gate | Vanilla (1.21.5) | Daggers |
+| --- | --- | --- |
+| Anvil / `/enchant` | `Enchantment#isAcceptableItem` → `supported_items` (`#enchantable/durability`) | Mixin `ANVIL_IDS` includes `minecraft:mending` |
+| Enchanting table | `isPrimaryItem` plus `#in_enchanting_table` (Mending is treasure, not in that tag) | Mixin `TABLE_IDS` **omits** Mending |
+| XP orb pickup | `ExperienceOrbEntity` repair → `EnchantmentHelper.getRandomItemWith(EnchantmentEffectComponentTypes.REPAIR_WITH_XP, player, ItemStack::isDamaged)` | No extra Java. Candidates are **equipped** damaged stacks that already have Mending. `supported_items` is **not** re-checked. |
+
+Mending JSON uses `"slots": ["any"]`, so every **equipment** slot counts: mainhand, offhand, armor. Hotbar that is not selected, backpack, and chests do not. Daggers are not armor, so only **MAINHAND and OFFHAND** apply.
+
+Thrown daggers are `DaggerEntity`, not player equipment — they do not mend in flight (same as tridents). After pickup or Loyalty/Restitution return they mend again only once held.
+
+Do **not** add `#daggercrafting:daggers` to `#minecraft:enchantable/durability` to “turn on” XP repair. That tag also feeds Vanishing Curse (section 12.1). The mixin apply path plus vanilla orb code is enough.
+
+`/xp add` writes the player’s XP bar and **does not** run orb repair. Use collected orbs (kills, bottles, summoned orbs) to test.
+
+If there is **no** vanilla component for your mechanic (dagger charge throw speed), put **no** `effects` (or omit the key) and implement in Java by looking up the `RegistryKey` and `EnchantmentHelper.getLevel`.
 
 Empty `all_of` stubs do not keep the enchantment “alive.” They only parse if present.
 
@@ -323,7 +341,7 @@ That does **not** rewrite vanilla JSON or tags. Tridents still use vanilla Loyal
 - **Current code:** last segment of the **translate key** (`enchantment.minecraft.loyalty` → `loyalty`) plus `contains`. Works for vanilla/this mod; brittle.
 - **Preferred:** parse `enchantment.<namespace>.<path>` to `Identifier` and `equals` a set of ids (`minecraft:loyalty`, …), or compare `ResourceKey` via a `Holder` lookup. `Enchantment` is a **record** and does not store its registry key; `equals` is value-based, so do not use a `HashMap<Enchantment, …>` keyed by value equality across reloads without care.
 
-Keep **two lists**: table (`isPrimaryItem`) without Mending; anvil (`canEnchant`) with Mending.
+Keep **two lists**: table (`isPrimaryItem`) without Mending; anvil (`isAcceptableItem`) with Mending.
 
 A custom enchantment that already sets `supported_items` / `primary_items` to `#daggercrafting:daggers` does **not** need the mixin.
 
@@ -356,7 +374,8 @@ Forbidden for selective dagger support: you must copy the full definition and yo
 | Table merge | `data/minecraft/tags/enchantment/in_enchanting_table.json` | Offers throwing_speed |
 | Keys | `ModEnchantments.THROWING_SPEED` | Lookup only |
 | Enchantability | `DaggerItem` `.enchantable(material.getEnchantability())` | Table rolls |
-| Vanilla on daggers | `EnchantmentMixin` | Loyalty, Sharpness, Smite, Bane, Fire Aspect, Flame, Unbreaking, Mending (anvil) |
+| Vanilla on daggers | `EnchantmentMixin` | Loyalty, Sharpness, Smite, Bane, Fire Aspect, Flame, Unbreaking, Mending (anvil apply) |
+| Mending XP | vanilla `ExperienceOrbEntity` | Equipped hands only; no durability-tag extend |
 | Loyalty motion | `DaggerEntity` + vanilla `trident_return_acceleration` | Runtime |
 | Flame on throw | Entity on-fire path | Not bow tag |
 
