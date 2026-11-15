@@ -371,7 +371,7 @@ Forbidden for selective dagger support: you must copy the full definition and yo
 | --- | --- | --- |
 | Item tag | `data/daggercrafting/tags/item/daggers.json` | All dagger ids |
 | Custom enchant | `data/daggercrafting/enchantment/throwing_speed.json` | Metadata + costs; speed is Java |
-| Table merge | `data/minecraft/tags/enchantment/in_enchanting_table.json` | Offers throwing_speed |
+| Table, loot, trades | `data/minecraft/tags/enchantment/in_enchanting_table.json`, `on_random_loot.json`, `tradeable.json` | Offers throwing_speed and restitution |
 | Keys | `ModEnchantments.THROWING_SPEED` | Lookup only |
 | Enchantability | `DaggerItem` `.enchantable(material.getEnchantability())` | Table rolls |
 | Vanilla on daggers | `EnchantmentMixin` | Loyalty, Sharpness, Smite, Bane, Fire Aspect, Flame, Unbreaking, Mending (anvil apply) |
@@ -387,7 +387,7 @@ Forbidden for selective dagger support: you must copy the full definition and yo
 
 ## 15. Pack format
 
-`pack.mcmeta` in this repo: resource `min_format` `[88, 0]`, data `max_format` `107` (26.2). Enchantment JSON layout above is the 1.21+ model and is what 26.2 loads. 26.3 bumps pack numbers; re-diff a vanilla enchantment JSON and mixin targets (`canEnchant`, `isPrimaryItem`) on port.
+`pack.mcmeta` on the 26.3 line: resource `min_format` `[88, 0]`, `max_format` `121`. 26.3 `version.json` is data **121.0** and resources **97.1**; 121 is the ceiling that still contains both. A 26.2 backport uses data **107.1**. Enchantment JSON layout above is the 1.21+ model. Mixin targets are `canEnchant` and `isPrimaryItem`.
 
 ---
 

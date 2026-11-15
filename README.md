@@ -30,9 +30,18 @@ When holding and releasing the right mouse button, the dagger will be thrown, si
 
 ## Melee Combat
 
-When in the main hand, the dagger will work just like a sword, but with less damage and a faster attack speed.
+When in the main hand, the dagger will work just like a sword, but with less damage, a faster attack speed, and a slightly shorter reach.
 
-Daggers also break cobwebs, leaves, and bamboo like swords.
+A dagger is a close-quarters weapon, so it keeps sword mining parity but swings at 80% of the distance a sword does:
+
+| | Swing reach (survival) | Swing reach (creative) |
+| --- | --- | --- |
+| Sword and other vanilla weapons | 3.0 blocks | 5.0 blocks |
+| Dagger | 2.4 blocks (80%) | 4.0 blocks (80%) |
+
+Only the distance at which a swing connects is shorter. Block breaking and entity interaction distance are unchanged, so chests, levers, trading and mounts behave exactly as they do with a sword. A connecting swing costs 1 durability.
+
+Daggers mine the same blocks as swords. Cobwebs drop the item, bamboo breaks instantly, and sword-efficient plants break faster: leaves, vines, glow lichen, pumpkins, melons, cocoa, big dripleaf, and chorus. A block that has hardness costs 2 durability. Instant blocks such as bamboo do not.
 
 ## Enchantments
 
@@ -40,30 +49,33 @@ Daggers support the following enchantments:
 
 ### Custom enchantments
 
-*   **Throwing Speed**
-    *   The **Throwing Speed** enchantment (Levels I-III) is a game-changer for ranged dagger combat. Each level significantly boosts your dagger's initial throwing velocity, leading to:
-    *   **Extended Range**: Hit targets from much further away.
-    *   **Increased Knockback**: Amplify the unique velocity-based knockback, sending foes reeling. This enchantment truly unlocks the full potential of daggers as a primary ranged weapon.
+*   **Throwing Speed** (Levels I-III)
+    *   Each level raises the dagger's throw speed, so it travels further and knocks the target back harder. Offered by the enchanting table, exploration loot, and librarian trades.
 *   **Restitution** (Level I)
-    *   On a thrown hit against an entity, including a fully blocked hit, the dagger is put back in the thrower's inventory immediately. Misses and block-only landings do not return. Cannot be combined with Loyalty.
+    *   On a thrown hit against an entity, including a fully blocked hit, the dagger is put back in the thrower's inventory immediately. Misses and block-only landings do not return. Cannot be combined with Loyalty. Same sources as Throwing Speed.
 
-### Vanilla
+### Vanilla, from the enchanting table
 
 *   **Loyalty** (Levels I-III)
-    *   Unlike vanilla tridents, a dagger's Loyalty enchantment scales directly with its material's base throwing velocity! High-tier daggers, like Diamond, return significantly faster, enabling quicker follow-up throws and a fluid ranged combat experience. Essential for viability as a ranged weapon.
+    *   The return speed scales with the material's base throw velocity, so a diamond or netherite dagger comes back faster than a wooden one.
 *   **Fire Aspect** (Levels I-II)
-    *   Works just like in vanilla. Sets the target on fire on melee attacks: **I** for 4 seconds, **II** for 8 seconds.
+    *   Melee only. Sets the target on fire: **I** for 4 seconds, **II** for 8 seconds.
 *   **Flame** (Level I)
-    *   Sets the thrown dagger on fire for 5 seconds. On a hit, the target is set on fire for 4 seconds, which is shorter than vanilla arrows (5 seconds). Ranged attacks only.
-
-_These enchantments work just like in vanilla. Their modifiers are applied on **melee and ranged attacks**._ All of them except Mending can be obtained through an enchanting table. Mending can be applied via an anvil.
-
+    *   Thrown attacks only. Sets the dagger on fire; a hit sets the target on fire for 4 seconds, which is shorter than a flame arrow (5 seconds).
 *   **Unbreaking** (Levels I-III)
 *   **Sharpness** (Levels I-V)
+    *   Extra damage on melee and thrown hits.
 *   **Smite** (Levels I-V)
+    *   Extra damage to undead on melee and thrown hits.
 *   **Bane of Arthropods** (Levels I-V)
+    *   Extra damage to arthropods on melee and thrown hits, and it slows them.
+
+### Vanilla, anvil only
+
 *   **Mending** (Level I)
-    *   XP orbs repair the dagger only while it is in the main hand or offhand, same as a sword. A dagger in the inventory or currently thrown does not mend.
+    *   Not offered by the enchanting table. XP orbs repair the dagger only while it is in the main hand or offhand. A dagger in the inventory, or one currently in the air, does not mend.
+
+Sweeping Edge, Knockback, and Looting are not supported. Daggers are not in the sword item tag, so sword-only enchantments stay off them. Trident and bow enchantments other than Loyalty and Flame are not supported either.
 
 ## Stats
 

@@ -19,13 +19,13 @@ Sources: [Fabric for 26.3](https://fabricmc.net/2026/09/15/263.html), [NeoForged
 
 ## 0. Baseline: what 26.2 already is (this repo)
 
-| Field | 26.2 (current) | 26.3 (target) |
+| Field | 26.2 (backport) | 26.3 (current development line) |
 | --- | --- | --- |
 | Game drop | Chaos Cubed | Wilderness Bound |
 | Java | 25 | 25 |
 | Obfuscation | No (official names) | Same |
-| Data pack format | 107.1 | **118.0** (snap 10+) |
-| Resource pack format | 88.0 | **97.0** (snap 10+) |
+| Data pack format | 107.1 | **121.0** (`version.json` `data_major`) |
+| Resource pack format | 88.0 | **97.1** (`version.json` `resource_major` / `resource_minor`) |
 | Fabric Loader | 0.19.5 | 0.19.5+ (check [develop](https://fabricmc.net/develop)) |
 | Fabric API | `0.161.0+26.2` | **`0.165.0+26.3`** (or newer on branch) |
 | Loom | `1.18-SNAPSHOT` | Keep **1.18-SNAPSHOT** (or latest 1.18.x); needs **Gradle 9.7.1** wrapper |
@@ -53,7 +53,7 @@ Safe to skip unless you add features later:
 1. `gradle.properties`: `minecraft_version=26.3`, `fabric_version=0.165.0+26.3` (or current from Fabric develop page).
 2. Confirm `gradle/wrapper/gradle-wrapper.properties` stays on **9.7.1** (`gradle-9.7.1-bin.zip` — plain `9.7` is not a valid distribution).
 3. `gradlew.bat genSources` (or full `build`) against 26.3.
-4. `src/main/resources/pack.mcmeta`: raise **`max_format`** to cover 26.3 (data **118**, resources **97**). Example: `"max_format": 118` if you only track the data ceiling, or set both min/max consistently with how 26.2 was done (`min_format` tuple for resources, integer max for data).
+4. `src/main/resources/pack.mcmeta`: one file is read as both a resource pack and a data pack, so the declared range has to contain **97.1 and 121.0**. Keep `min_format` at `[88, 0]`. Set `"max_format": 121`. A bare integer uses the top codec, whose omitted minor is unbounded, so 121 covers 121.0. `118` is too old for the 26.3 data pack and the pack is reported incompatible.
 
 Loader **0.19.5** is still cited for 26.3 on the Fabric blog; bump only if develop recommends a newer patch.
 
@@ -65,7 +65,7 @@ Loader **0.19.5** is still cited for 26.3 on the Fabric blog; bump only if devel
 
 | 26.2 | 26.3 | Notes |
 | --- | --- | --- |
-| `this.hurtMarked = true` | `this.syncVelocity()` (or equivalent on `Entity`) | NeoForged primer: `hurtMarked` → `syncVelocity`. Used when delta movement is large so clients get velocity sync. Compare **`ThrownTrident#tick`** on 26.3 after genSources. |
+| `this.hurtMarked = true` | `this.syncVelocity = true` | `Entity.syncVelocity` is a public boolean, not a method. Set it when delta movement is large so clients get a velocity packet. Compare **`ThrownTrident#tick`**. |
 
 No other entity fields from the 26.3 migration lists appear in our entity code (`invulnerableTime`, swing APIs, etc. are unused).
 
@@ -86,7 +86,7 @@ Low-level types (`SubmitNodeCollector`, `ItemModelResolver`, `CameraRenderState`
 | File | 26.3 expectation |
 | --- | --- |
 | `item/DaggerItem.java` | Re-copy patterns from **`TridentItem`** if `use` / `releaseUsing` / `ProjectileItem` changed. Watch **`LivingEntity#swing`** if you add arm swing with `SwingAnimation` (not used today). Item `TOOL` rules that mention block tags must use `BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)` at Fabric `main` init; `BuiltInRegistries.BLOCK.getOrThrow(TagKey)` throws `Tags not bound` (datagen and client). |
-| `mixin/EnchantmentMixin.java` | Re-check `@Inject` targets on **`Enchantment`** after compile; vanilla enchantment Java changed around registry holders but our mixin is `isAcceptableItem` / `isPrimaryItem`. |
+| `mixin/EnchantmentMixin.java` | Re-check `@Inject` targets on **`Enchantment`** after compile. The methods are `canEnchant` and `isPrimaryItem`. `isAcceptableItem` is the old Yarn name and is not a method on 26.3. |
 | `ModItems`, `ModEntities`, `ModEnchantments`, `DaggerToolMaterial`, clients | Usually version bump only. |
 | `DaggerCraftingDataGenerator` | Empty stub — ignore until you generate data; 26.3 datagen for reloadable registries is a different beast (loot/advancements/recipes as registries). |
 
@@ -121,10 +121,11 @@ Gameplay note (not a port task): 26.3 changes sun-burn protection enchant behavi
 
 1. **Gradle** — `minecraft_version`, `fabric_version`; build once.
 2. **`pack.mcmeta`** — formats for 26.3.
-3. **`DaggerEntity.java`** — `hurtMarked` → `syncVelocity` (or vanilla equivalent).
+3. **`DaggerEntity.java`** — `hurtMarked = true` → `syncVelocity = true`.
 4. **`DaggerEntityRenderer.java`** — `mulPose` → `rotate`.
 5. **Compile** — `gradlew.bat compileJava`; fix any new `TridentItem` / `AbstractArrow` / `Enchantment` diffs.
-6. **Manual test** — creative combat tab, throw + pickup + loyalty return, `throwing_speed` levels, melee hit, enchant mixin (daggers in table).
+6. **`DaggerItem.java`** — confirm `DataComponents.ATTACK_RANGE` (from `DAGGER_ATTACK_RANGE`) still compiles and the constant still derives from the `Player` reach defaults; the component signature and `AttackRange` field order are the things most likely to shift. See `docs/ATTACK_RANGE.md`.
+7. **Manual test** — creative combat tab, throw + pickup + loyalty return, `throwing_speed` levels, melee hit, enchant mixin (daggers in table), and the dagger reach boundary (2.3 connects / 2.5 does not).
 
 ---
 
@@ -132,8 +133,8 @@ Gameplay note (not a port task): 26.3 changes sun-burn protection enchant behavi
 
 | Version | Data pack | Resource pack | Notes for this mod |
 | --- | --- | --- | --- |
-| 26.2 | 107.1 | 88.0 | Current `pack.mcmeta` targets through 107. |
-| 26.3 | **118.0** | **97.0** | Snapshot 10+; update `max_format` / metadata before release. |
+| 26.2 | 107.1 | 88.0 | Backport `pack.mcmeta` ceiling. |
+| 26.3 | **121.0** | **97.1** | Release `version.json`. This line's `max_format` is **121**. |
 
 ---
 
@@ -152,10 +153,11 @@ Open beside our code while fixing:
 
 ## 8. Honest gaps
 
-Not line-verified against a 26.3 jar in this workspace (primer + Fabric post + community port notes only):
+Checked against the 26.3 sources jar: `Entity.syncVelocity` is a public boolean, and `DaggerEntity` assigns `true`. `Enchantment.canEnchant` and `Enchantment.isPrimaryItem` are the mixin targets.
 
-- Exact signature of `Entity#syncVelocity` vs old `hurtMarked` assignment semantics.
+Still worth a glance on the next version bump:
+
 - Whether `ThrownItemRenderer#submit` or `extractRenderState` renamed again.
-- Whether `EnchantmentMixin` descriptor strings need updating.
+- Whether the mixin method descriptors still match after an obfuscation or signature change.
 
 Treat those as “open vanilla on 26.3 genSources” items — typically minutes, not a second full port.
