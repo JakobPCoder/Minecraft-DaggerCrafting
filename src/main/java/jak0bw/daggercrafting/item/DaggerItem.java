@@ -27,7 +27,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -44,6 +43,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.AttackRange;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -132,10 +132,15 @@ public class DaggerItem extends Item implements ProjectileItem {
 	 * block breaking and entity interaction distance behave exactly as with a vanilla sword.
 	 *
 	 * Mining copies vanilla {@code ToolMaterial.applySwordProperties} {@link DataComponents#TOOL} rules
-	 * (cobweb, {@link BlockTags#SWORD_INSTANTLY_MINES}, {@link BlockTags#SWORD_EFFICIENT}). Daggers are
-	 * not added to {@code #minecraft:swords}; that item tag would leak Sweeping Edge and other sword-only
-	 * enchantments. {@link DaggerToolMaterial#getMiningSpeed()} is unused here so every tier matches
-	 * sword speeds rather than pickaxe-style tier scaling.
+	 * (cobweb, {@link BlockTags#SWORD_INSTANTLY_MINES}, {@link BlockTags#SWORD_EFFICIENT}) and is the same
+	 * for every tier. Daggers are not added to {@code #minecraft:swords}; that item tag would leak
+	 * Sweeping Edge and other sword-only enchantments.
+	 *
+	 * {@link DataComponents#WEAPON} is what makes a melee hit spend durability. {@code ItemStack.hurtEnemy}
+	 * returns false without it, so {@code Player} never reaches the post-hit hook and the swing is free.
+	 * {@code Weapon(1)} matches a sword: one durability, and no shield disable (an axe passes 5 seconds).
+	 * The item class does not override {@code postHurtEnemy}; {@code ItemStack.postHurtEnemy} already
+	 * spends {@code itemDamagePerAttack}, and a second {@code hurtAndBreak} would charge the hit twice.
 	 *
 	 * @param properties base registry properties from mod item registration
 	 * @param material tier stats source
@@ -154,6 +159,8 @@ public class DaggerItem extends Item implements ProjectileItem {
 			.repairable(material.getRepairIngredientTag())
 			.enchantable(material.getEnchantability())
 			.component(DataComponents.TOOL, swordLikeMiningTool())
+			// Without this, melee hits deal damage and then skip durability. See applyDaggerSettings.
+			.component(DataComponents.WEAPON, new Weapon(1))
 			// Weapon-type reach: deliberately shorter than a sword's; see DAGGER_ATTACK_RANGE.
 			.component(DataComponents.ATTACK_RANGE, DAGGER_ATTACK_RANGE)
 			.attributes(
@@ -358,12 +365,6 @@ public class DaggerItem extends Item implements ProjectileItem {
 			user.startUsingItem(hand);
 			return InteractionResult.CONSUME;
 		}
-	}
-
-	/** Standard weapon durability loss on melee hit (throw durability is handled in {@link #releaseUsing}). */
-	@Override
-	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
 	}
 
 	/**

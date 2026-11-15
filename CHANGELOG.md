@@ -3,14 +3,14 @@
 ## [1.5.0]
 
 ### Added
-- Daggers mine cobwebs, leaves, and bamboo at the same speeds as swords.
+- Sword mining. Cobwebs drop the item, bamboo breaks instantly, and `#minecraft:sword_efficient` blocks break at sword speed (1.5): leaves, vines, glow lichen, pumpkins, carved pumpkins, jack o'lanterns, melons, cocoa, big dripleaf, and chorus. Every other block stays at speed 1.0. A block that actually has hardness costs 2 durability, same as a sword; instant blocks such as bamboo do not.
 
 ### Changed
-- Daggers now have a shorter melee reach than swords: 2.4 blocks compared to 3.0 (creative 4.0 compared to 5.0). Block breaking, entity interaction and throwing are unchanged.
+- Melee reach is 80% of a sword: 2.4 blocks in survival (was 3.0) and 4.0 in creative (was 5.0). Mining distance, right-click interaction (chests, levers, trading, mounts), and throwing are unchanged.
 
 ### Fixed
-- Mending now repairs from XP orbs while the dagger is in the main hand or offhand, matching swords. Still anvil/treasure only; inventory and thrown daggers do not mend.
-- Client and datagen no longer crash while registering daggers: sword mining tags (`sword_instantly_mines`, `sword_efficient`) are resolved with vanilla’s bootstrap registry lookup instead of the unbound live tag set.
+- A melee hit now costs 1 durability and counts as a weapon use. On the 1.4.0 26.x jars the swing dealt damage and then skipped the wear, because the dagger never had the vanilla weapon component a sword uses. Thrown hits already spent durability in 1.4.0.
+
 
 ## [1.4.0]
 
@@ -62,7 +62,7 @@
   - Iron dagger
   - Golden dagger
   - Diamond dagger
-- Vanilla enchantment support (Loyalty, Fire Aspect, Flame, Sharpness, Smite, Bane of Arthropods, Mending)
+- Vanilla enchantment support (Loyalty, Fire Aspect, Flame, Unbreaking, Sharpness, Smite, Bane of Arthropods; Mending from an anvil only)
 - Custom Throwing Speed enchantment (Levels I-III)
 - Velocity-based knockback system
 - Crafting recipes for all dagger variants 

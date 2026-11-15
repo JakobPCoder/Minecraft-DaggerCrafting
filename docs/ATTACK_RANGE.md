@@ -150,7 +150,7 @@ Every dagger tier carries one shared component, defined as `DaggerItem.DAGGER_AT
 | `hitboxMargin` | 0.0 | 0.0 | sword parity; 0.3 would give 2.7 effective and cancel the change |
 | `mobFactor` | 0.345 | 1.0 | `2.4 × 0.345 = 0.828`, matching `Mob.DEFAULT_ATTACK_REACH` |
 
-Values are derived from the `Player` constants rather than hardcoded, so a future vanilla default-reach change re-derives instead of silently drifting. Reach is a weapon-type value, not a material field, mirroring vanilla where every sword tier shares one reach.
+The player reach fields come from the `Player` constants, so a future change to those defaults re-derives survival and creative reach. `mobFactor` does not: it is the literal `0.345F`, tuned so `2.4 × 0.345` matches `Mob.DEFAULT_ATTACK_REACH` (about 0.828). It is not 0.8. Reach is a weapon-type value, not a material field, mirroring vanilla where every sword tier shares one reach.
 
 ## 7. Verification recipe
 

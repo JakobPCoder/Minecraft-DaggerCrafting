@@ -225,7 +225,7 @@ Packages below use **official 26.2** names in the “now” column. Yarn package
 
 **26.2:** `ItemIds` for vanilla-style registration. `ItemStackTemplate.fromStack`. `ItemStack#getDamageSource` signature simplified.
 
-`DaggerToolMaterial` is *our* class, not vanilla `ToolMaterial`. Keep it. `BlockTags.INCORRECT_FOR_*_TOOL` still exist as of 1.21.x; confirm copper: this mod’s copper dagger uses `INCORRECT_FOR_STONE_TOOL`. If 26.2 added official copper tools, there may be `INCORRECT_FOR_COPPER_TOOL` — optional improvement, not a compile requirement.
+`DaggerToolMaterial` is *our* class, not vanilla `ToolMaterial`. Keep it. From 1.5.0 it stores throw stats, melee damage, durability, and enchantability only. Mining is the shared sword `TOOL` component on `DaggerItem`, not a per-tier `INCORRECT_FOR_*` tag.
 
 ### 3.5 `ProjectileItem`, thrown spawn, trident-like use
 
@@ -524,7 +524,7 @@ Entrypoint only. No Minecraft types besides the Fabric initializer. Likely compi
 
 ### 5.3 `DaggerToolMaterial.java`
 
-Tag / identifier / `BlockTags` renames only. Confirm `INCORRECT_FOR_*` still exist.
+Identifier renames only. There is no `BlockTags` use left in this class; do not reintroduce a per-tier incorrect-block tag.
 
 ### 5.4 `ModItems.java`
 
