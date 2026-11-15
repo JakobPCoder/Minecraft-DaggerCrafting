@@ -6,6 +6,9 @@ import jak0bw.daggercrafting.ModEnchantments;
 import jak0bw.daggercrafting.item.DaggerItem;
 import jak0bw.daggercrafting.particle.ParticleDirector;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -275,7 +278,7 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		if (!this.level().isClientSide()) {
 			double velocitySquared = this.getDeltaMovement().lengthSqr();
 			if (velocitySquared > 2.0) {
-				this.hurtMarked = true;
+				this.syncVelocity = true;
 			}
 		}
 	}
@@ -328,6 +331,15 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 	}
 
 	/**
+	 * Tridents are not piercing arrows: collide with at most one entity per step.
+	 */
+	@Override
+	protected Collection<EntityHitResult> findHitEntities(Vec3 currentPosition, Vec3 nextPosition) {
+		EntityHitResult hit = this.findHitEntity(currentPosition, nextPosition);
+		return hit != null ? List.of(hit) : List.of();
+	}
+
+	/**
 	 * Tier stats from the pickup stack; falls back to diamond in {@link DaggerItem#getMaterialFromItem} if corrupt.
 	 */
 	public DaggerToolMaterial getMaterial() {
@@ -375,12 +387,12 @@ public class DaggerEntity extends AbstractArrow implements ItemSupplier {
 		}
 
 		if (!this.level().isClientSide() && this.isOnFire() && targetEntity instanceof LivingEntity living && !living.fireImmune()) {
-			living.igniteForSeconds(4);
+			// Vanilla arrow parity: Flame burns the struck target for 5 seconds (AbstractArrow.onHitEntity).
+			living.igniteForSeconds(5.0F);
 		}
 
 		// Nearly stop forward motion so loyalty pull can take over on the next tick.
-		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false);
-		this.setDeltaMovement(this.getDeltaMovement().multiply(0.02, 0.2, 0.02));
+		this.deflect(ProjectileDeflection.REVERSE, targetEntity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
 		this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);
 		this.tryRestitutionReturn();
 	}
