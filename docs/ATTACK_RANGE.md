@@ -1,6 +1,8 @@
-# Minecraft 26.3 attack range (melee reach)
+# Minecraft attack range (melee reach)
 
-Reference for **this repo** on **Minecraft 26.3** (official names, Fabric/Loom). Use it instead of re-reading vanilla jars that mix 1.20-era "reach" folklore (attribute `reach_distance`) with the current component model.
+Reference for **this repo** on **Minecraft 26.2+** where the `minecraft:attack_range` item component exists (official names on 26.x, Fabric/Loom). Use it instead of re-reading vanilla jars that mix 1.20-era "reach" folklore (attribute `reach_distance`) with the current component model.
+
+On **Minecraft 1.21.5**, the `attack_range` component does not exist (it arrives in 1.21.11), so daggers keep sword melee reach there; see `docs/PORTING_1.21.5_TO_26.2.md` for the 1.5.0 availability table.
 
 **Authoritative sources (re-verify only on a version bump):**
 
@@ -12,7 +14,7 @@ Reference for **this repo** on **Minecraft 26.3** (official names, Fabric/Loom).
 
 ## 1. Mental model: three separate ranges
 
-Vanilla does **not** have one "reach". Three independent values sit next to each other, and mixing them up is the usual source of confusing behaviour:
+The following applies on **26.2 and 26.3** (and any Minecraft version that ships `DataComponents.ATTACK_RANGE` / `minecraft:attack_range`). Vanilla does **not** have one "reach". Three independent values sit next to each other, and mixing them up is the usual source of confusing behaviour:
 
 | Range | Where it lives | Survival | Creative | Gates |
 | --- | --- | --- | --- | --- |

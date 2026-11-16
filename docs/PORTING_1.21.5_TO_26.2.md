@@ -627,6 +627,17 @@ Empty. Ignore until you generate tags/recipes. Then use 26.1 names (`FabricTagsP
 | 26.1 | 1.15 | 0.18.4 | **Must** switch Loom plugin id. **Must** Java 25. **Must** official names. Fabric API class rename dump (item groups, tracked data registry → `FabricEntityDataRegistry`, `FabricItem.Settings` → `Properties`, world→level event names). `fabric` mod id gone. Conventional tags v1 / loot v2 gone — unused. |
 | 26.2 | 1.17+ | 0.19.3+ | Enum extensions — unused. Tag `fabric:remove` — unused. `Gui`/`Hud` split — unused unless we set screens. |
 
+## 1.5.0 feature availability by Minecraft version
+
+| 1.5.0 change | 26.3 | 26.2 | 1.21.5 |
+| --- | --- | --- | --- |
+| Sword-parity mining (`tool` component) | yes | yes | yes |
+| Melee hit costs 1 durability | yes (`weapon` component) | yes (`weapon` component) | yes (`weapon` component; `postDamageEntity` alone never runs) |
+| 80 % sword melee reach | yes (`attack_range`) | yes (`attack_range`, since 26.x) | **no** — component exists only from 1.21.11 |
+| Flame burns 5 s on thrown hit | yes | yes | yes |
+
+On 1.21.5, `ItemStack.postHit` returns true only when `minecraft:weapon` is present, and the player attack path calls `postDamageEntity` only in that case. A dagger with only a `postDamageEntity` override therefore takes no melee durability. The 1.21.5 line attaches `WeaponComponent(1)` and removes the override, the same 1-damage result as the 26.x `weapon` component. Keeping both would charge 2.
+
 Recommended port strategy for *this* repo: **one jump** 1.21.5 Yarn → 26.2 official, using this file + 26.2 genSources + vanilla `TridentItem` / `ThrownTrident` / `ThrownItemRenderer` as templates. An intermediate 1.21.11 Yarn port would duplicate renderer `submit` work and still require a mappings migrate.
 
 If you *do* two-step: (1) 1.21.9/1.21.11 Yarn: `getEntityWorld`, `submit` renderer, pack.mcmeta; (2) Loom migrateMappings / Ravel Yarn→official; (3) 26.1 plugin + `ItemStackTemplate` + Fabric API renames; (4) 26.2 Ids/Gui if compile errors remain.

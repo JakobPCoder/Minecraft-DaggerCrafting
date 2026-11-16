@@ -1,6 +1,12 @@
-# Git branching workflow (26.x)
+# Git branching workflow (26.x and 1.21.5)
 
-This repo supports **Minecraft 26.x only**. Older `1.21.x` branches are **legacy and frozen**: do not add features there.
+This repo keeps **three live integration lines** per mod release when that release ships on more than one Minecraft version:
+
+- **`26.3-<mod>`** — source of truth for gameplay and shared design.
+- **`26.2-<mod>`** — backport of the same mod version on Minecraft 26.2.
+- **`1.21.5-<mod>`** — backport of the same mod version on Minecraft 1.21.5 (Yarn).
+
+Only **1.21.4 and older** `1.21.x` lines are **legacy and frozen**: do not add features there.
 
 You do not need to be a Git expert. Copy the PowerShell commands as written. Use `;` between commands (not `&&`).
 
@@ -10,24 +16,27 @@ You do not need to be a Git expert. Copy the PowerShell commands as written. Use
 
 | Purpose | Pattern | Example |
 | --- | --- | --- |
-| Integration line for one MC + mod release | `<mc>-<mod>` | `26.3-1.5.0`, `26.2-1.4.0` |
+| Integration line for one MC + mod release | `<mc>-<mod>` | `26.3-1.5.0`, `26.2-1.5.0`, `1.21.5-1.5.0` |
 | Feature | `<mc>-<mod>-<feature>` | `26.3-1.5.0-shorter-reach` |
 
 1. Create the **line branch** from the previous line on that Minecraft version (version bump / changelog stub only — no features yet).
 2. Branch features off that line; merge features **into** the line branch.
 3. Release from the line branch; tags stay `v<mod>-<mc>` (e.g. `v1.4.0-26.2`).
 
-`main` is the latest **released** line. Today that is still the 1.4.0 release (`26.2-1.4.0` and `main` match). Do not commit features on `main`. Do not add features on legacy `1.21.x-*` or on frozen old lines such as `26.3-1.2.1`.
+`main` is the latest **released** line. Do not commit features on `main`. Do not add features on frozen `1.21.4-*` and older `1.21.x-*`, or on abandoned old lines such as `26.3-1.2.1`.
 
 The `base/*` and `feature/*` layout at the bottom of this file is **historical**. Do not create those names for new work.
 
 ## Source of truth: 26.3
 
-Gameplay and shared code are written on **26.3**. A 26.2 line of the same mod version is a **backport**: same features, plus only the files Minecraft 26.2 still requires.
+Gameplay and shared code land on **26.3** first. **`26.2-<mod>`** and **`1.21.5-<mod>`** are **backports** of that mod version: same product intent, plus only what each Minecraft version and mappings still require.
 
-Do **not** start a feature on 26.2 and merge it forward. Do **not** rebase 26.3 onto 26.2, cherry-pick a whole feature line, or use `merge -X ours` / `-X theirs` as the default.
+Do **not** start a feature on 26.2 or 1.21.5 and merge it forward. Do **not** rebase 26.3 onto a backport line, cherry-pick a whole feature line, or use `merge -X ours` / `-X theirs` as the default.
 
-Files that differ between the two lines today: `gradle.properties` (Minecraft / Fabric version), `fabric.mod.json`, `pack.mcmeta`, `DaggerEntity.java` (`syncVelocity` is a boolean field on 26.3, `findHitEntities`, 5-arg `deflect`), `DaggerEntityRenderer.java` (`rotate` instead of `mulPose`).
+Files that differ per backport (typical 1.5.0 set):
+
+- **26.2:** `gradle.properties`, `fabric.mod.json`, `pack.mcmeta`, `DaggerEntity.java` (`velocity` sync vs `hurtMarked`, `deflect` arity, missing `findHitEntities` on 26.2), `DaggerEntityRenderer.java` (`mulPose` vs `rotate` on 26.3).
+- **1.21.5:** all of the above at the Yarn/API layer, plus Yarn names, `ToolComponent` / `DataComponentTypes`, `Registries.BLOCK` tag lookup, renderer and particle API, and Java **21** toolchain (not JDK 25).
 
 ## Recipe: start a new mod version on 26.3
 
@@ -77,6 +86,30 @@ Rebuild on 26.2:
 
 `gradle.properties` almost always conflicts on a version bump: keep **26.2 engine versions** and the **new `mod_version`**.
 
+After merging, `git diff 26.3-<mod> 26.2-<mod>` should show **only** port files (toolchain, pack format, version range, API names) plus documented version-specific gaps. Gameplay must not exist on only one of the lines.
+
+## Recipe: backport the same mod version to 1.21.5
+
+Do this when **1.21.5** still ships for that mod version. **Never squash-merge `26.3-<mod>` or `26.2-<mod>` into a 1.21.5 line** — a merge imports Mojmap/26.x Java into a Yarn tree.
+
+```powershell
+git switch 1.21.5-1.4.0
+git pull
+git switch -c 1.21.5-1.5.0
+```
+
+Bump `mod_version` in `gradle.properties`, commit the line start, then **hand-apply** the 1.5.0 gameplay delta from `26.3-1.5.0` using Yarn names and the 1.21.5 toolchain (see `docs/PORTING_1.21.5_TO_26.2.md`).
+
+Build on 1.21.5 with JDK 21:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.7.6-hotspot'
+.\gradlew.bat compileJava
+.\gradlew.bat build
+```
+
+Post-port check: `git diff 26.2-<mod> 1.21.5-<mod>` must show only the Yarn/port delta plus **documented** gameplay gaps (for example, no `attack_range` on 1.21.5 — see `docs/PORTING_1.21.5_TO_26.2.md`).
+
 ## Recipe: new Minecraft version (port only)
 
 When a newer MC needs a port of an **already shipped** mod version, branch from the 26.3 line of that version. Put **only** port fixes there (Gradle, `pack.mcmeta`, `fabric.mod.json`, compile/API). No new daggers or enchantments.
@@ -111,9 +144,10 @@ git merge --abort
 ## Pre-merge checklist
 
 - `.\gradlew.bat build` succeeds on the Minecraft version of that branch.
-- `gradle.properties` `minecraft_version` matches the branch (`26.2` on `26.2-*`, `26.3` on `26.3-*`).
+- `gradle.properties` `minecraft_version` matches the branch (`26.2` on `26.2-*`, `26.3` on `26.3-*`, `1.21.5` on `1.21.5-*`).
 - No scratch files: `.cursor/mc-*-src/`, `cf_page.html`, `run/`, `.gradle/` (these are gitignored).
-- After a 26.3→26.2 backport, `git diff 26.3-<mod> 26.2-<mod>` should show **only** port files (toolchain, pack format, version range, API names) plus version-specific notes. Gameplay must not exist on only one of the two lines.
+- After a 26.3→26.2 backport, `git diff 26.3-<mod> 26.2-<mod>` should show **only** port files plus documented gaps.
+- After a 1.21.5 backport, `git diff 26.2-<mod> 1.21.5-<mod>` should match the known Yarn delta plus documented gap files (not extra gameplay on one line only).
 
 ## Tags
 
