@@ -43,11 +43,9 @@ replay_*.log
 
 *.py
 
-# cursor local scratch (decompiled Minecraft sources, browser dumps, plans)
+# Cursor (skills, rules, plans, decompiled sources) — local only
 
-.cursor/mc-*-src/
-.cursor/tmp-vanilla/
-.cursor/plans/
+.cursor/
 cf_page.html
 
 # Local AI notes and caches (not needed to build or ship the mod)
